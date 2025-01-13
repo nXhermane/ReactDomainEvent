@@ -1,11 +1,11 @@
 import { EventBus } from "../EventBus";
 import { EventHandler } from "../EventHandler";
 import { EventData, IDomainEvent } from "../interfaces/DomainEvent";
-
-export default function (eventType: Function) {
+import { Constants } from "../constants/constants";
+export  function EventHandlerFor (eventType: Function) {
   return function (target: Function) {
     //Enregistrer le Event Type dans les metadata de la classe pour y acceder dans la  methode getEventName
-    Reflect.defineMetadata("handler", eventType.name, target);
+    Reflect.defineMetadata(Constants.handlerMetaDataKey, eventType.name, target);
     // sauvegarde de la reference au constructeur original et typer explicitment le constructeur
     const originalConstructor = target as { new (...args: any[]): any };
 

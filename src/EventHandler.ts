@@ -1,5 +1,6 @@
 import { EventData, IDomainEvent } from "./interfaces/DomainEvent";
 import { IEventHandler } from "./interfaces/EventHandler";
+import { Constants } from "./constants/constants";
 
 export abstract class EventHandler<
   DataType extends EventData,
@@ -15,7 +16,7 @@ export abstract class EventHandler<
   }
   abstract execute(event: EventType): void | Promise<void>;
   getEventName(): string {
-    const metadata = Reflect.getMetadata("handler",this.constructor)
+    const metadata = Reflect.getMetadata(Constants.handlerMetaDataKey,this.constructor)
     return metadata
   }
 }

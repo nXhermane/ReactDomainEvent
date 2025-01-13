@@ -24,7 +24,7 @@ const config = {
     new CleanWebpackPlugin(),
     new DtsBundleWebpack({
       name: "ReactNativeDomainEvent",
-      main: "dist/main.d.ts",
+      main: "dist/src/main.d.ts",
       out: "index.d.ts",
       removeSource: true,
       outputAsModuleFolder: true,
@@ -47,7 +47,8 @@ const config = {
       {
         test: /\.(ts|tsx)$/i,
         loader: "ts-loader",
-        exclude: ["/node_modules/"],
+       
+        exclude: ["/node_modules/","/exemple/"]
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,

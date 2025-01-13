@@ -4,12 +4,9 @@ import {
   IDomainEvent,
 } from "./interfaces/DomainEvent";
 import { IEventBus } from "./interfaces/EventBus";
-import { IEventHandler } from "./interfaces/EventHandler";
-import isAsyncFunction from "../utils/isAsyncFunction";
 import { EventHandler } from "./EventHandler";
 import { DomainEvent } from "./DomainEvent";
 import Stack from "../utils/Stack";
-import { equal } from "assert";
 
 export class EventBus implements IEventBus {
   private static instance: EventBus | null = null;
@@ -30,13 +27,9 @@ export class EventBus implements IEventBus {
     event: T
   ): void {
     if (this.checkEventEmissionInHandler()) {
-      if (this.parentChildProcessing) {
-        const activEvent = this.getActivedEvent(EventHandlingState.WAITING);
-        event.setParentId(activEvent.getId());
-      } else {
-        const activEvent = this.getActivedEvent();
-        event.setParentId(activEvent.getId());
-      }
+      const activeEvent = this.processQueue.peek();
+      event.setParentId(activeEvent?.getId() as string);
+      this.setEventState(activeEvent?.getId() as string,EventHandlingState.WAITING)
     }
     this.eventQueue.push({
       event: event,
@@ -70,20 +63,19 @@ export class EventBus implements IEventBus {
   private async dispatchEvent<T extends DomainEvent<any>>(
     event: T
   ): Promise<void> {
-    if (this.isProcessing && !this.parentChildProcessing) {
-      this.parentChildProcessing = true;
-      this.setEventState(event.getId(), EventHandlingState.ON);
-      this.setEventState(
-        event.getMetaData().parentId as string,
-        EventHandlingState.WAITING
-      );
-    } else if (this.parentChildProcessing) {
-      console.log("Processig child true");
-    } else {
-      this.setEventState(event.getId(), EventHandlingState.ON);
-      this.isProcessing = true;
+    if(this.isProcessing && !this.parentChildProcessing) {
+      this.setEventState(event.getId(),EventHandlingState.ON)
+      event.setHandlerState(EventHandlingState.ON)
+      this.setEventState(event.getParentId(),EventHandlingState.WAITING)
+      this.parentChildProcessing = true
+    }else if(this.isProcessing && this.parentChildProcessing) {
+      this.setEventState(event.getId(),EventHandlingState.ON)
+      event.setHandlerState(EventHandlingState.ON)
+    }else {
+      event.setHandlerState(EventHandlingState.ON)
+      this.setEventState(event.getId(),EventHandlingState.ON)
+      this.isProcessing = true
     }
-    this.processQueue.log();
     this.processQueue.push(event);
 
     const eventName = event.getName();
@@ -94,14 +86,13 @@ export class EventBus implements IEventBus {
         this.executeHandler<any, T>(handler, event)
       )
     );
-    if (this.isProcessing && this.parentChildProcessing) {
-      this.setEventState(event.getId(), EventHandlingState.OFF);
-      this.setEventState(event.getId(), EventHandlingState.ON);
-      this.parentChildProcessing = false;
-    } else if (this.isProcessing) {
-      this.setEventState(event.getId(), EventHandlingState.OFF);
-    } else {
-      console.log("Pocess Undefined");
+    if(this.isProcessing && this.parentChildProcessing) {
+       this.setEventState(event.getId(),EventHandlingState.OFF)
+       this.setEventState(event.getParentId(),EventHandlingState.ON)
+       this.parentChildProcessing =false
+    }else if(this.isProcessing && !this.parentChildProcessing){
+      this.setEventState(event.getId(),EventHandlingState.OFF)
+      this.isProcessing = false ;
     }
     this.processQueue.pop();
   }
@@ -110,8 +101,7 @@ export class EventBus implements IEventBus {
     T extends DomainEvent<DataType>
   >(handler: EventHandler<DataType, T>, event: T): Promise<void> {
     try {
-      if (isAsyncFunction(handler.execute)) await handler.execute(event);
-      else handler.execute(event);
+      await Promise.resolve(handler.execute(event));
     } catch (error) {
       console.error("Error executing handler");
     }
