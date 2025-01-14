@@ -9,7 +9,7 @@ export interface EventMetadata {
   eventId: string;
   occurredAt: Date;
   attempts: number;
-  lastErors?: Error;
+  lastError?: Error;
   nextRetryAt?: Date;
   handlerState: EventHandlingState;
   parentId?: string;

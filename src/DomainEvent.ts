@@ -24,6 +24,10 @@ export abstract class DomainEvent<T extends EventData>
   getMetaData(): EventMetadata {
     return this.metadata;
   }
+  setMetaData(data: EventMetadata): void {
+    if(data.eventId != this.metadata.eventId) throw new Error("[Error] : ce eventMetaData n'est pas pour ce DomainEvent")
+    this.metadata = data
+  }
   setHandlerState(handlerState: EventHandlingState) {
     this.metadata.handlerState = handlerState;
   }
