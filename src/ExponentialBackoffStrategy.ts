@@ -13,6 +13,8 @@ export class ExponentialBackoffStrategy implements IExponentialBackoffStrategy {
     shouldRetry(attempts: number, error: Error): boolean {
        // Verifier si l'attempts est inferieur au maxAttempts
        if(attempts>= this.maxAttemps) return false 
+       // L'Erreur est permanente lorsque le DeadLetterEchoue au traitement de l'event 
+       // Mais cela n'est pas encore implementer dans notre system 
        if(error instanceof PermanentEventHandleFailureError) return false ;
        return true
     }
@@ -28,7 +30,7 @@ export class ExponentialBackoffStrategy implements IExponentialBackoffStrategy {
             this.maxDelay
           );
           
-          // Ajouter un jitter(variation aleatoire) pour éviter le "thundering herd"(surcharge causer par des retries simultanes)
+          // Ajouter un jitter (variation aleatoire) pour éviter le "thundering herd" (surcharge causer par des retries simultanes)
           return delay + (Math.random() * delay * 0.1);
     }
 

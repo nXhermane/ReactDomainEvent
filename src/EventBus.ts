@@ -5,17 +5,17 @@ import { DomainEvent } from "./DomainEvent";
 import Stack from "../utils/Stack";
 
 type EventQueueObject = { event: DomainEvent<any>; timestamp: number };
-export class EventBus implements IEventBus {
-  private static instance: EventBus | null = null;
+export abstract class EventBus implements IEventBus {
+  //private static instance: EventBus | null = null;
   private eventQueue: Array<EventQueueObject> = [];
   private handlers: Map<string, Set<EventHandler<any, any>>> = new Map();
   private queueStack: Stack<DomainEvent<any>> = new Stack();
-  private constructor() {}
+  constructor() {}
 
-  static getInstance(): EventBus {
-    if (EventBus.instance === null) EventBus.instance = new EventBus();
-    return EventBus.instance as EventBus;
-  }
+  // static getInstance(): EventBus {
+  //   if (EventBus.instance === null) EventBus.instance = new EventBus();
+  //   return EventBus.instance as EventBus;
+  // }
 
   publish<DataType extends EventData, T extends DomainEvent<DataType>>(
     event: T
@@ -46,7 +46,7 @@ export class EventBus implements IEventBus {
   ): void {
     // Verifier s'il existe deja des handlers associés a ce l'event du handler a ajouter
     if (!this.handlers.has(handler.getEventName())) {
-      // Creer le container des handlers de cet evenement 
+      // Creer le container des handlers de cet evenement
       this.handlers.set(
         handler.getEventName(),
         new Set<EventHandler<DataType, T>>()
@@ -57,7 +57,7 @@ export class EventBus implements IEventBus {
     handlers.add(handler);
     this.handlers.set(handler.getEventName(), handlers);
   }
-  public  dispatch(eventName: string) {
+  public dispatch(eventName: string) {
     // Rechercher et Trier les events dans la file d'attente ayant ce nom
     const eventObjects = this.sortEventByTimestamps(
       this.searchEventWithEventName(eventName)
@@ -103,7 +103,7 @@ export class EventBus implements IEventBus {
     T extends DomainEvent<DataType>
   >(handler: EventHandler<DataType, T>, event: T): Promise<void> {
     try {
-      await Promise.resolve(handler.execute(event));
+      await Promise.resolve(handler._internalExecute(event));
     } catch (error) {
       console.error("Error executing handler");
     }
@@ -127,7 +127,7 @@ export class EventBus implements IEventBus {
   private sortEventByTimestamps(
     eventObjects: EventQueueObject[]
   ): EventQueueObject[] {
-    // trier du plus grand au plus petit les evenements pour avoir le plus anciens en debut de liste :
+    // Trier du plus grand au plus petit les evenements pour avoir le plus anciens en debut de liste :
     // Implication : Le plus ancien sera donc le premier a executer
     return eventObjects.sort(
       (eventObject1, eventObject2) =>
@@ -139,5 +139,21 @@ export class EventBus implements IEventBus {
       (eventObject) => eventObject.event.getName() === eventName
     );
     return eventQueueObjects;
+  }
+  protected seachHandlerByNameOrId<
+    DataType extends EventData,
+    T extends DomainEvent<DataType>
+  >(name: string, id: string): EventHandler<DataType, T>[] {
+    // Recuperer tous les handlers dans un array
+    const handlers = Array.from(this.handlers.values())
+      .map((handlerSet) => {
+        const eventhandlers = Array.from(handlerSet);
+        return eventhandlers;
+      })
+      .flat();
+    const filteredHandler = handlers.filter(
+      (handler) => handler.getId() === id || handler.getName() === name
+    );
+    return filteredHandler;
   }
 }

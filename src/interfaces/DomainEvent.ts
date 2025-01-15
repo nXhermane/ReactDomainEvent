@@ -1,3 +1,5 @@
+import { ExceptionBase } from "../errors/ExceptionBase";
+
 export interface IDomainEvent<T extends EventData> {
   metadata: EventMetadata;
   data: T;
@@ -7,19 +9,24 @@ export interface IDomainEvent<T extends EventData> {
 
 export interface EventMetadata {
   eventId: string;
+  name: string;
   occurredAt: Date;
   attempts: number;
-  lastError?: Error;
+  lastError?: ExceptionBase;
   nextRetryAt?: Date;
-  handlerState: EventHandlingState;
+  domainEventState: DomainEventState;
   parentId?: string;
+  message?: string;
+  showOnUI?: boolean;
 }
 
-export enum EventHandlingState {
-  ON = "on",
-  OFF = "off",
-  WAITING = "waiting",
+export enum DomainEventState {
+  IsProcessing = "isProcessing",
+  IsCompleted = "isCompleted",
+  HasFailed = "hasFailed",
+  NeedRetry = "needRetry",
 }
+
 export interface EventData {
   [key: string]: any;
 }
