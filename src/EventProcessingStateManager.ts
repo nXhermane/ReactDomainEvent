@@ -8,15 +8,6 @@ import {
   IEventProcessingStateManager,
 } from "./interfaces/EventProcessingStateManager";
 
-/**
- * DomainEventProcessingState
- *
- * Représente l'état de chaque événement de domaine émis avec ses handlers associés.
- * Stocke uniquement les métadonnées des événements et des handlers.
- * Gère le tableau des handlers pour déterminer si tous sont terminés, mettant à jour
- * l'état de l'événement de domaine de "processing" à "completed".
- * Si au moins un handler échoue, l'état de l'événement devient "hasFailed".
- */
 
 interface ArchiEventProcessingState extends EventProcessingState {
   child: EventProcessingState[];

@@ -7,9 +7,7 @@ import {
   FailedHandlerData,
   IDeadLetterQueue,
 } from "./interfaces/DeadLetterQueue";
-import { EventData } from "./main";
-import { eventNames } from "process";
-
+import { EventData } from "./interfaces/DomainEvent";
 
 export class DeadLetterQueue implements IDeadLetterQueue {
   private readonly store: Map<string, FailedEvent<any>> = new Map();

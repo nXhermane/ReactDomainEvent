@@ -1,20 +1,31 @@
 {
-  "name": "ReactNativeDomainEvent",
+  "name": "domain-eventrix",
   "version": "1.0.0",
-  "description": "Domain event management on React native platform",
-  "main": "src/index.ts",
+  "description": "A Typescript library for managing domain events, providing integration with React,React Native , and supporting DDD use cases. Designed to work in Typescript projects.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    "./react": "./react.js",
+    "./ddd": "./ddd.js",
+    ".": "./index.js"
+  },
   "author": "nXhermane",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/index.ts",
-    "build": "webpack && node clean-empty-dirs.js",
+    "start": "nodemon test.ts",
+    "build": "webpack --mode production",
+    "build:dev": "webpack && node clean-empty-dirs.js",
     "build:doc:html": "npx documentation build ./**/*.ts -f html -o docs",
     "build:doc:md": "npx documentation build ./**/*.ts -f md -o docs/Readme.md",
     "test": "jest"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.5",
+    "@types/react": "^19.0.7",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^12.0.2",
     "documentation": "^14.0.3",

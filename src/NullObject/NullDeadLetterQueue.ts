@@ -5,7 +5,7 @@ import {
   FailedHandlerData,
   IDeadLetterQueue,
 } from "../interfaces/DeadLetterQueue";
-import { EventData } from "../main";
+import { EventData } from "../interfaces/DomainEvent";
 
 export class NullDeadLetterQueue implements IDeadLetterQueue {
   async addFailedEvent<T extends DomainEvent<any>>(

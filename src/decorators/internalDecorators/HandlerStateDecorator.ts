@@ -1,7 +1,10 @@
 import { EventHandler } from "../../EventHandler";
 import { EventProcessingStateManager } from "../../EventProcessingStateManager";
 import { HandlerState } from "../../interfaces/EventHandler";
-
+/**
+ * Decorateur utilisé en interne pour actualiser l'etat des handlers afin de recuperer les metrics lie a l'execution des handlers et au domain event
+ * @returns 
+ */
 export function HandlerStateDecorator() {
   return function (
     target: any,

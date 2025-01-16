@@ -1,6 +1,7 @@
 export const Constants = {
   handlerMetaDataKey: "handler",
   eventMessageOption: "domainEventMessage",
+  eventBusDefaultKey: "SharedEnhancedEventBus",
   // constante du Exponential Back off Strategy
   maxAttempts: 5,
   baseDelay: 1000,

@@ -1,4 +1,4 @@
-import { Constants } from "./../constants/constants";
+import { Constants } from "../constants/constants";
 import { EnhancedEventBus, EnhancedEventBusConfig } from "../EnhancedEventBus";
 import { DeadLetterQueue } from "../DeadLetterQueue";
 import { ExponentialBackoffStrategy } from "../ExponentialBackoffStrategy";
@@ -9,7 +9,7 @@ import { EventMonitoringSystem } from "../EventMonitoringSystem";
 import { NullEventMonitoringSystem } from "../NullObject/NullEventMonitoringSystem";
 import { OnDeadLetter } from "../types";
 
-export function createAvancedEventBus(
+export function createEnhancedEventBus(
   config: EnhancedEventBusConfig,
   onDeadLetter: OnDeadLetter = async (
     event: FailedEvent<any>

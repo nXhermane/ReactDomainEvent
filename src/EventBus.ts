@@ -1,21 +1,15 @@
 import { EventData, IDomainEvent } from "./interfaces/DomainEvent";
-import { IEventBus } from "./interfaces/EventBus";
+import { EventType, IEventBus } from "./interfaces/EventBus";
 import { EventHandler } from "./EventHandler";
 import { DomainEvent } from "./DomainEvent";
 import Stack from "../utils/Stack";
 
 type EventQueueObject = { event: DomainEvent<any>; timestamp: number };
 export abstract class EventBus implements IEventBus {
-  //private static instance: EventBus | null = null;
   private eventQueue: Array<EventQueueObject> = [];
   private handlers: Map<string, Set<EventHandler<any, any>>> = new Map();
   private queueStack: Stack<DomainEvent<any>> = new Stack();
   constructor() {}
-
-  // static getInstance(): EventBus {
-  //   if (EventBus.instance === null) EventBus.instance = new EventBus();
-  //   return EventBus.instance as EventBus;
-  // }
 
   publish<DataType extends EventData, T extends DomainEvent<DataType>>(
     event: T
@@ -57,7 +51,9 @@ export abstract class EventBus implements IEventBus {
     handlers.add(handler);
     this.handlers.set(handler.getEventName(), handlers);
   }
-  public dispatch(eventName: string) {
+  public dispatch<T extends EventData = any>(eventType: EventType<T>) {
+    const eventName =
+      typeof eventType === "string" ? eventType : eventType.name;
     // Rechercher et Trier les events dans la file d'attente ayant ce nom
     const eventObjects = this.sortEventByTimestamps(
       this.searchEventWithEventName(eventName)

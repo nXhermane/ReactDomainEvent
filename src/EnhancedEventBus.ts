@@ -8,12 +8,12 @@ import {
   FailedHandlerData,
   IDeadLetterQueue,
 } from "./interfaces/DeadLetterQueue";
+import { DomainEventState, EventData } from "./interfaces/DomainEvent";
 import {
   EventMetricsReport,
   IEventMonitoringSystem,
 } from "./interfaces/EventMonitoringSystem";
 import { IExponentialBackoffStrategy } from "./interfaces/ExponentialBackOfStategy";
-import { DomainEventState, EventData } from "./main";
 
 export interface EnhancedEventBusConfig {
   enableRetrySystem: boolean; // default true
@@ -128,4 +128,5 @@ export class EnhancedEventBus extends EventBus {
   getMetrics(): EventMetricsReport {
     return this.monitoring.getMetrics();
   }
+  
 }

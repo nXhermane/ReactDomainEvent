@@ -4,5 +4,8 @@ node_modules
 docs
 .vscode 
 dist
-yarn.lock
-./src/exemple
+/yarn.lock
+/src/exemple
+srcNew
+/test.js
+/test.ts

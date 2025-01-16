@@ -1,3 +1,4 @@
+import { Constants } from "./constants/constants";
 import { DeadLetterQueue } from "./DeadLetterQueue";
 import { EnhancedEventBus, EnhancedEventBusConfig } from "./EnhancedEventBus";
 import { EventMonitoringSystem } from "./EventMonitoringSystem";
@@ -5,10 +6,10 @@ import { ExponentialBackoffStrategy } from "./ExponentialBackoffStrategy";
 import { FailedEvent, IDeadLetterQueue } from "./interfaces/DeadLetterQueue";
 import { IEventMonitoringSystem } from "./interfaces/EventMonitoringSystem";
 import { IExponentialBackoffStrategy } from "./interfaces/ExponentialBackOfStategy";
-import { Constants } from "./main";
 import { NullDeadLetterQueue } from "./NullObject/NullDeadLetterQueue";
 import { NullEventMonitoringSystem } from "./NullObject/NullEventMonitoringSystem";
 import { NullExponentialBackOffStrategy } from "./NullObject/NullExponentialBackOffStrategy";
+import { InstanceManager } from "./shared/InstanceManager";
 import { OnDeadLetter } from "./types";
 
 export interface SharedEnhancedEventBusConfig extends EnhancedEventBusConfig {
@@ -35,6 +36,11 @@ export class SharedEnhancedEventBus extends EnhancedEventBus {
   }
   static configure(config: SharedEnhancedEventBusConfig) {
     SharedEnhancedEventBus.config = satisfies(config);
+    SharedEnhancedEventBus.intance = SharedEnhancedEventBus.create(config);
+    InstanceManager.register<SharedEnhancedEventBus>(
+      Constants.eventBusDefaultKey,
+      SharedEnhancedEventBus.getInstance()
+    );
   }
 
   private static create(
@@ -76,6 +82,10 @@ export class SharedEnhancedEventBus extends EnhancedEventBus {
         SharedEnhancedEventBus.config
           ? SharedEnhancedEventBus.config
           : SharedEnhancedEventBus.defaultConfig
+      );
+      InstanceManager.register<SharedEnhancedEventBus>(
+        Constants.eventBusDefaultKey,
+        SharedEnhancedEventBus.intance
       );
     }
     return SharedEnhancedEventBus.intance;

@@ -7,48 +7,45 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV === "production";
-
 const config = {
-  entry: "./src/index.ts",
+  entry: { index: "./src/index.ts", react: "./src/react/index.ts" ,ddd: "./src/ddd/index.ts"},
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "index.js",
+    //filename: "[main].js",
     chunkFilename: "[main].js",
-    library: {
-      name: "ReactNativeDomainEvent",
-      type: "umd",
-    },
+    library: ["ReactNativeDomainEvent", "[main]"],
+    libraryTarget: "umd",
     globalObject: "this",
   },
   plugins: [
     new CleanWebpackPlugin(),
     new DtsBundleWebpack({
       name: "ReactNativeDomainEvent",
-      main: "dist/src/main.d.ts",
-      out: "index.d.ts",
+      main: "dist/src/type.d.ts",
+      out: "../index.d.ts",
       removeSource: true,
       outputAsModuleFolder: true,
     }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: "./package.json",
-          to: "./package.json",
-        },
-        {
-          from: "./docs",
-          to: "./docs",
-        },
-      ],
-    }),
+    // new CopyWebpackPlugin({
+    //   patterns: [
+    //     {
+    //       from: "./package.json",
+    //       to: "./package.json",
+    //     },
+    //     {
+    //       from: "./docs",
+    //       to: "./docs",
+    //     },
+    //   ],
+    // }),
   ],
   module: {
     rules: [
       {
         test: /\.(ts|tsx)$/i,
         loader: "ts-loader",
-       
-        exclude: ["/node_modules/","/exemple/"]
+
+        exclude: ["/node_modules/", "/exemple/", "/srcNew/"],
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
@@ -84,6 +81,9 @@ const config = {
     ],
   },
   mode: "development",
+  externals: {
+    react: 'react'
+  }
 };
 
 module.exports = () => {
