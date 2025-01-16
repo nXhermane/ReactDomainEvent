@@ -2,15 +2,19 @@
   "name": "domain-eventrix",
   "version": "1.0.0",
   "description": "A Typescript library for managing domain events, providing integration with React,React Native , and supporting DDD use cases. Designed to work in Typescript projects.",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "./react": "./react.js",
-    "./ddd": "./ddd.js",
-    ".": "./index.js"
+    "./react": "./dist/react.js",
+    "./ddd": "./dist/ddd.js",
+    ".": "./dist/index.js"
   },
   "author": "nXhermane",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nXhermane/ReactDomainEvent.git"
+  },
   "scripts": {
     "start": "nodemon test.ts",
     "build": "webpack --mode production",
