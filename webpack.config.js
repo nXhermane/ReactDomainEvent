@@ -8,23 +8,43 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV === "production";
 const config = {
-  entry: { index: "./src/index.ts", react: "./src/react/index.ts" ,ddd: "./src/ddd/index.ts"},
+  entry: {
+    index: "./src/index.ts",
+    "react/index": "./src/react/index.ts",
+    "ddd/index": "./src/ddd/index.ts",
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
-    //filename: "[main].js",
-    chunkFilename: "[main].js",
-    library: ["ReactNativeDomainEvent", "[main]"],
+    filename: "[name].js",
+    //chunkFilename: "[name]/index.js",
+    library: ["domain-eventrix", "[name]"],
     libraryTarget: "umd",
     globalObject: "this",
   },
   plugins: [
     new CleanWebpackPlugin(),
     new DtsBundleWebpack({
-      name: "ReactNativeDomainEvent",
-      main: "dist/src/type.d.ts",
-      out: "../index.d.ts",
-      removeSource: true,
+      name: "domain-eventrix",
+      main: "/home/hermane/Dev/node/open-source/ReactNativeDomainEvent/dist/src/type.d.ts",
+      out: "/home/hermane/Dev/node/open-source/ReactNativeDomainEvent/dist/index.d.ts",
+      removeSource: false,
       outputAsModuleFolder: true,
+   
+    }),
+    new DtsBundleWebpack({
+      name: "react",
+      main: "/home/hermane/Dev/node/open-source/ReactNativeDomainEvent/dist/src/react/index.d.ts",
+      out: "/home/hermane/Dev/node/open-source/ReactNativeDomainEvent/dist/react/index.d.ts",
+      removeSource: true,
+   
+    
+    }),
+    new DtsBundleWebpack({
+      name: "ddd",
+      main: "/home/hermane/Dev/node/open-source/ReactNativeDomainEvent/dist/src/ddd/index.d.ts",
+      out: "/home/hermane/Dev/node/open-source/ReactNativeDomainEvent/dist/ddd/index.d.ts",
+      removeSource: true,
+ 
     }),
     // new CopyWebpackPlugin({
     //   patterns: [
@@ -82,8 +102,8 @@ const config = {
   },
   mode: "development",
   externals: {
-    react: 'react'
-  }
+    react: "react",
+  },
 };
 
 module.exports = () => {
