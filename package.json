@@ -33,7 +33,8 @@
     "test": "jest"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "devDependencies": {
     "@types/jest": "^29.5.14",
