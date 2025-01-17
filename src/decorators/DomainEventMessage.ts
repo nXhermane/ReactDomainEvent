@@ -19,12 +19,10 @@ export interface DomainEventMessageOptions {
 export function DomainEventMessage(
   message: string,
   isVisibleOnUI: boolean = false
-) {
-  return function (
-    target: any,
-    propertyName?: string,
-    descriptor?: PropertyDescriptor
-  ) {
+):ClassDecorator {
+  return  (
+    target: Function
+  ) =>{
     Reflect.defineMetadata(
       Constants.eventMessageOption,
       {
@@ -33,6 +31,5 @@ export function DomainEventMessage(
       },
       target
     );
-    return target;
   };
 }

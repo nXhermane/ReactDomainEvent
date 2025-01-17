@@ -1,6 +1,7 @@
 import { EventBus } from "../EventBus";
 import { Constants } from "../constants/constants";
-import { DomainEvent, EventType } from "../type";
+import { EventType } from "../interfaces/EventBus";
+
 import { Constructor } from "../types";
 
 import {

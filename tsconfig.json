@@ -114,5 +114,7 @@
     "skipLibCheck": true
     /* Skip type checking all .d.ts files. */
   },
-   "include": ["src/**/*"]
+   "include": ["src/**/*"],
+   "paths" : ["src/index.ts","src/ddd/index.ts","src/react/index.ts"],
+   "baseUrl": "."
 }
