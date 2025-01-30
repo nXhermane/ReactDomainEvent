@@ -1,9 +1,9 @@
-import { DomainEvent } from "../../DomainEvent";
-import { EventData } from "../../interfaces/DomainEvent";
-import { EventType } from "../../type";
+import { DomainEvent } from "../../core/DomainEvent";
+import { EventData } from "../../core/interface /DomainEvent";
+import { EventType } from "../../core/interface /EventBus";
 import { useEventBus } from "./useEventBus";
 
-export function useEventBusMethode() {
+export function useEventBusMethods() {
   const eventBus = useEventBus();
   const publish = <DataType extends EventData, T extends DomainEvent<DataType>>(
     event: T

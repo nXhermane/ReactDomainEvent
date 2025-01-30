@@ -1,6 +1,6 @@
 // TODO : remove debug mode after developement
 export const Config ={
-    mode: "debug" 
+    mode: "production" 
 }
 
 interface IConfig {

@@ -1,23 +1,25 @@
-import { DomainEvent } from "./DomainEvent";
-import { ExceptionBase } from "./errors/ExceptionBase";
-import { FailedEventNotFoundOnDLQ } from "./errors/FailedEventNotFoundOnDLQ";
-import { EventBus } from "./EventBus";
-import { EventHandler } from "./EventHandler";
-import { EventProcessingStateManager } from "./EventProcessingStateManager";
+import { DomainEvent } from "../core/DomainEvent";
+import { DomainEventrix } from "../DomainEventrix";
+import { ExceptionBase } from "../errors/ExceptionBase";
+import { FailedEventNotFoundOnDLQ } from "../errors/FailedEventNotFoundOnDLQ";
+import { EventBus } from "../core/EventBus";
+import { EventHandler } from "../core/EventHandler";
 import {
   FailedHandlerData,
   IDeadLetterQueue,
-} from "./interfaces/DeadLetterQueue";
-import { DomainEventState, EventData } from "./interfaces/DomainEvent";
+} from "../addons/interfaces/DeadLetterQueue";
+import { DomainEventState, EventData } from "../core/interface /DomainEvent";
 import {
   EventMetricsReport,
   IEventMonitoringSystem,
-} from "./interfaces/EventMonitoringSystem";
-import { IExponentialBackoffStrategy } from "./interfaces/ExponentialBackOfStategy";
+} from "../addons/interfaces/EventMonitoringSystem";
+import { IExponentialBackoffStrategy } from "../addons/interfaces/ExponentialBackOfStategy";
+import { Constructor } from "../types/types";
 
 export interface EnhancedEventBusConfig {
-  enableRetrySystem: boolean; // default true
-  enableMonitoringSystem: boolean; // default true
+  eventBusKey: string | Constructor<EnhancedEventBus>
+  enableRetrySystem?: boolean;
+  enableMonitoringSystem?: boolean;
   maxEventOnDQL?: number;
   maxAttempts?: number;
   baseDelay?: number;
@@ -27,12 +29,15 @@ export class EnhancedEventBus extends EventBus {
   private readonly retryStrategy: IExponentialBackoffStrategy;
   private readonly deadLetterQueue: IDeadLetterQueue;
   private readonly monitoring: IEventMonitoringSystem;
+  private readonly eventBuskey: string | Constructor<EnhancedEventBus>;
   constructor(
+    evenBusKey: string | Constructor<EnhancedEventBus>,
     retryStrategy: IExponentialBackoffStrategy,
     deadLetterQueue: IDeadLetterQueue,
     monitoring: IEventMonitoringSystem
   ) {
     super();
+    this.eventBuskey = evenBusKey;
     this.retryStrategy = retryStrategy;
     this.deadLetterQueue = deadLetterQueue;
     this.monitoring = monitoring;
@@ -62,7 +67,9 @@ export class EnhancedEventBus extends EventBus {
       } else {
         // Changer l'etat avant actualiser les donnees de l'eventProcessingStateManager
         event.setState(DomainEventState.NeedRetry);
-        EventProcessingStateManager.getInstance().addHandler(event, handler);
+        DomainEventrix.getEventProcessingStateManagerByEventBusKey(
+          this.eventBuskey
+        )?.addHandler(event, handler);
         await this.moveToDeadLetterQueue(event, {
           id: handler.getId(),
           name: handler.getName(),
@@ -128,5 +135,4 @@ export class EnhancedEventBus extends EventBus {
   getMetrics(): EventMetricsReport {
     return this.monitoring.getMetrics();
   }
-  
 }

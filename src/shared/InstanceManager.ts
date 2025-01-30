@@ -1,17 +1,51 @@
-import { Constructor } from "../types";
+import { Constructor } from "../types/types";
+
+const instanceManagerKey ="__INSTANCE_MANAGER__"
+// Symbol("InstanceManager");
+
+declare global {
+  interface GlobalThis {
+    [instanceManagerKey]: InstanceManager | null;
+  }
+}
+const getGlobalContext = (): GlobalThis => {
+  if (typeof globalThis !== undefined)
+    return globalThis as unknown as GlobalThis;
+  if (typeof global !== undefined) return global as unknown as GlobalThis;
+  if (typeof window !== undefined) return window as unknown as GlobalThis;
+  if (typeof self !== undefined) return self as unknown as GlobalThis;
+  throw new Error("Impossible de trouver le context global.");
+};
 
 /**
  * @class InstanceManager
  * @desc: Gestionnaire d'instance permettant d'enregistrer des instances et de les recuperer grâce a une Key
  */
-export class InstanceManager {
-  private static instances: Map<string, any> = new Map<string, any>();
+export default class InstanceManager {
+  private instances: Map<string, any> = new Map<string, any>();
+  private static insanceCounter: number = 0; // For Debug
+
+  private constructor() {}
+  /**
+   * Retourne l'instance de InstanceManager
+   * @returns retourne l'instance single de InstanceManager
+   */
+  public static get(): InstanceManager {
+    console.log("Recuperation de l'instance ", InstanceManager.insanceCounter);
+    const globalContext = getGlobalContext();
+    if (!globalContext[instanceManagerKey]) {
+      InstanceManager.insanceCounter++;
+      console.log("Warn", instanceManagerKey);
+      globalContext[instanceManagerKey] = new InstanceManager();
+    }
+    return globalContext[instanceManagerKey];
+  }
   /**
    * Enregistre une instance avec un identifiant specifique ou type
    * @param key Identifiant unique ou le constructeur de la classe
    * @param instance Instance de classe a enregistrer
    */
-  static register<T>(key: string | Constructor<T>, instance: T): void {
+  register<T>(key: string | Constructor<T>, instance: T): void {
     const keyName = this.getKeyName(key);
     if (this.has(key)) {
       console.warn(
@@ -26,7 +60,7 @@ export class InstanceManager {
    * @returns Instance Resolue
    * @throws Erreur lorsque l'instance n'est pas trouvé
    */
-  static resolve<T>(key: string | Constructor<T>): T {
+  resolve<T>(key: string | Constructor<T>): T {
     const keyName = this.getKeyName(key);
     if (!this.has(key)) {
       throw new Error(`Pas d'instance enregistré pour cette key ${keyName}`);
@@ -38,7 +72,7 @@ export class InstanceManager {
    * @param key Identifiant unique ou le constructeur de la classe
    * @returns True si l'instance existe et Fasle si non
    */
-  static has<T>(key: string | Constructor<T>): boolean {
+  has<T>(key: string | Constructor<T>): boolean {
     const keyName = this.getKeyName(key);
     return this.instances.has(keyName);
   }
@@ -46,7 +80,7 @@ export class InstanceManager {
    * Supprime l'instance avec sont identifiant unique ou type
    * @param key Identifiant unique ou le constructeur de la classe
    */
-  static unregister<T>(key: string | Constructor<T>): void {
+  unregister<T>(key: string | Constructor<T>): void {
     const keyName = this.getKeyName(key);
     if (this.instances.delete(keyName)) {
       console.log(`Instance ayant la key: ${keyName} a été supprimée.`);
@@ -59,7 +93,7 @@ export class InstanceManager {
    * @param key
    * @returns la key sous forme de string
    */
-  private static getKeyName<T>(key: string | Constructor<T>): string {
+  private getKeyName<T>(key: string | Constructor<T>): string {
     return typeof key === "string" ? key : key.name;
   }
 }

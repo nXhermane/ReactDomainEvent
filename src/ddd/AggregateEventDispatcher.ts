@@ -1,13 +1,30 @@
 import { Constants } from "../constants/constants";
-import { DomainEvent } from "../DomainEvent";
-import { EventBus } from "../EventBus";
-import { InstanceManager } from "../shared/InstanceManager";
-import { Constructor } from "../types";
+import { DomainEvent } from "../core/DomainEvent";
+import { DomainEventrix } from "../DomainEventrix";
+import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
+import { EventBus } from "../core/EventBus";
+import { Constructor } from "../types/types";
 
-interface Aggregate {
-  getID<ID extends string | number>(): ID;
-  getDomainEvents(): DomainEvent<any>[];
-  clearDomainEvent(): void;
+/**
+ * @class AggregateRoot Basical Representation
+ *
+ */
+export abstract class Aggregate {
+  /**
+   * @abstract @method getID
+   * @description Return the DDD aggregateRoot id as string or number
+   */
+  abstract getID<ID extends any >(): ID;
+  /**
+   * @abstract @method getDomainEvents
+   * @description Return all domain events stored on the DDD aggregateRoot
+   */
+  abstract getDomainEvents(): DomainEvent<any>[];
+  /**
+   * @abstract @method clearDomainEvent
+   * @description Clear aggregateRoot DomainEvents Container
+   */
+  abstract clearDomainEvent(): void;
 }
 /**
  * @abstract @class AggregateEventDispatcher
@@ -18,9 +35,11 @@ export abstract class AggregateEventDispatcher<T extends Aggregate> {
   private eventBus: EventBus;
   private queuedAggregates: T[] = [];
   constructor(
-    eventBusKey: string | Constructor<EventBus> = Constants.eventBusDefaultKey
+    eventBusKey:
+      | string
+      | Constructor<EnhancedEventBus> = Constants.eventBusDefaultKey
   ) {
-    this.eventBus = InstanceManager.resolve<EventBus>(eventBusKey);
+    this.eventBus = DomainEventrix.get(eventBusKey);
   }
   /**
    * Ajoute l'aggregat dans a une file d'attente

@@ -1,6 +1,6 @@
-import { Constants } from "./constants/constants";
-import { ExceptionBase } from "./errors/ExceptionBase";
-import { PermanentEventHandleFailureError } from "./errors/PermanentEventHandleFailureError";
+import { Constants } from "../constants/constants";
+import { ExceptionBase } from "../errors/ExceptionBase";
+import { PermanentEventHandleFailureError } from "../errors/PermanentEventHandleFailureError";
 import { IExponentialBackoffStrategy } from "./interfaces/ExponentialBackOfStategy";
 
 export class ExponentialBackoffStrategy implements IExponentialBackoffStrategy {

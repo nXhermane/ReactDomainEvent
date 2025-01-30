@@ -1,7 +1,7 @@
-import { DomainEvent } from "../DomainEvent";
-import { EventHandler } from "../EventHandler";
-import { EventMetadata } from "./DomainEvent";
-import { EventHandlerMetaData } from "./EventHandler";
+import { DomainEvent } from "../../core/DomainEvent";
+import { EventHandler } from "../../core/EventHandler";
+import { EventMetadata } from "../../core/interface /DomainEvent";
+import { EventHandlerMetaData } from "../../core/interface /EventHandler";
 
 
 /**

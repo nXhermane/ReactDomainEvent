@@ -1,12 +1,12 @@
-import generateUniqueId from "../utils/generateUniqueId";
-import { Constants } from "./constants/constants";
-import { DomainEventMessageOptions } from "./decorators/DomainEventMessage";
+import generateUniqueId from "../../utils/generateUniqueId";
+import { Constants } from "../constants/constants";
+import { DomainEventMessageOptions } from "../decorators/DomainEventMessage";
 import {
   DomainEventState,
   EventData,
   EventMetadata,
   IDomainEvent,
-} from "./interfaces/DomainEvent";
+} from "./interface /DomainEvent";
 
 export class DomainEvent<T extends EventData> implements IDomainEvent<T> {
   metadata: EventMetadata;

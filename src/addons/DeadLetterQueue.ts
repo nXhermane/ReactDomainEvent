@@ -1,13 +1,13 @@
-import { Constants } from "./constants/constants";
-import { DomainEvent } from "./DomainEvent";
-import { ExceptionBase } from "./errors/ExceptionBase";
+import { Constants } from "../constants/constants";
+import { DomainEvent } from "../core/DomainEvent";
+import { ExceptionBase } from "../errors/ExceptionBase";
 import {
   FailedEvent,
   FailedEventSerialize,
   FailedHandlerData,
   IDeadLetterQueue,
 } from "./interfaces/DeadLetterQueue";
-import { EventData } from "./interfaces/DomainEvent";
+import { EventData } from "../core/interface /DomainEvent";
 
 export class DeadLetterQueue implements IDeadLetterQueue {
   private readonly store: Map<string, FailedEvent<any>> = new Map();

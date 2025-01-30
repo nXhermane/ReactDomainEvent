@@ -1,22 +1,12 @@
-import { PropsWithChildren, useEffect, useState } from "react";
-import { EnhancedEventBus } from "../EnhancedEventBus";
+import React, { useRef } from "react";
 import {
   EventProcessingState,
   EventProcessingStateObserver,
-} from "../interfaces/EventProcessingStateManager";
-import {  InstanceManager } from "../shared/InstanceManager";
-import { Constants } from "../constants/constants";
-import { EventProcessingStateManager } from "../EventProcessingStateManager";
-import React from "react";
+} from "../addons/interfaces/EventProcessingStateManager";
 import { EventContext } from "./EventContext";
-import { Constructor } from "../types";
-
-const getEventBusGetterFunc = (
-  eventBusKey?: string | Constructor<EnhancedEventBus>
-): (() => EnhancedEventBus) => {
-  return () =>
-    InstanceManager.resolve(eventBusKey || Constants.eventBusDefaultKey);
-};
+import { DomainEventrix, EventManagerConfig } from "../DomainEventrix";
+import { Constants } from "../constants/constants";
+import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
 
 class EventContextProcessingStateObserver
   implements EventProcessingStateObserver
@@ -30,32 +20,85 @@ class EventContextProcessingStateObserver
     this.onEventPocessingStateChange(state);
   }
 }
-export interface EventProviderProps extends PropsWithChildren {
-  eventBusKey?: string | Constructor<EnhancedEventBus>;
-}
+
+export interface EventProviderProps
+  extends React.PropsWithChildren,
+    EventManagerConfig {}
 
 export const EventProvider: React.FC<EventProviderProps> = ({
-  eventBusKey,
   children,
+  enableMonitoringSystem,
+  enableStateManagement,
+  eventBusKey,
+  maxAttempts,
+  maxDelay,
+  maxEventOnDQL,
+  enableRetrySystem,
+  onDeadLetter,
 }) => {
-  const [eventProcessingState, setEventProcessingState] = useState<
+  // State
+  const [eventProcessingState, setEventProcessingState] = React.useState<
     EventProcessingState[]
   >([]);
-  const observer = new EventContextProcessingStateObserver(
-    (eventState: EventProcessingState[]) => {
-      setEventProcessingState(eventProcessingState);
-    }
+   console.log("Provider Entering")
+  const eventBus = useRef<EnhancedEventBus | null>(null);
+
+
+  const observer = React.useMemo<EventProcessingStateObserver>(
+    () =>
+      new EventContextProcessingStateObserver(
+        (eventState: EventProcessingState[]) =>
+          setEventProcessingState((postEventState: EventProcessingState[]) => {
+            return [...postEventState, ...eventState];
+          })
+      ),
+    []
   );
-  const getEventBus = getEventBusGetterFunc(eventBusKey);
-  useEffect(() => {
-    EventProcessingStateManager.getInstance().subscribe(observer);
+
+  React.useEffect(() => {
+    console.log("UseEffect Munt")
+    if (
+      !DomainEventrix.getInstanceManager().has(
+        eventBusKey || Constants.eventBusDefaultKey
+      )
+    ) {
+      console.log("EventBus Creation ", eventBus,eventBusKey,DomainEventrix.get(eventBusKey||Constants.eventBusDefaultKey))
+      DomainEventrix.create({
+        eventBusKey: eventBusKey || Constants.eventBusDefaultKey,
+        enableMonitoringSystem,
+        maxAttempts,
+        maxEventOnDQL,
+        maxDelay,
+        onDeadLetter,
+        enableRetrySystem,
+      });
+    }
+    if (eventBus.current === null) {
+      console.log("Assignement ", eventBus,eventBusKey,DomainEventrix.get(eventBusKey||Constants.eventBusDefaultKey))
+      eventBus.current = DomainEventrix.get(
+        eventBusKey || Constants.eventBusDefaultKey
+      );
+    }
+    if (enableStateManagement) {
+      DomainEventrix.addEventProcessingStateManager(eventBusKey);
+      DomainEventrix.getEventProcessingStateManagerByEventBusKey(
+        eventBusKey
+      )?.subscribe(observer);
+    }
+
     return () => {
-      EventProcessingStateManager.getInstance().unsubscribe(observer);
+      if (enableStateManagement)
+        DomainEventrix.getEventProcessingStateManagerByEventBusKey(
+          eventBusKey
+        )?.unsubscribe(observer);
     };
-  }, [eventBusKey]);
+  }, [eventBusKey, enableStateManagement]);
   return (
     <EventContext.Provider
-      value={{ getEventBus, eventProcessingState: eventProcessingState }}
+      value={{
+        eventBus: eventBus.current as EnhancedEventBus,
+        eventProcessingState: eventProcessingState,
+      }}
     >
       {children}
     </EventContext.Provider>

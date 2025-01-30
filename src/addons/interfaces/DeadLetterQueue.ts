@@ -1,6 +1,6 @@
-import { DomainEvent } from "../DomainEvent";
-import { ExceptionBase } from "../errors/ExceptionBase";
-import { EventData } from "./DomainEvent";
+import { DomainEvent } from "../../core/DomainEvent";
+import { ExceptionBase } from "../../errors/ExceptionBase";
+import { EventData } from "../../core/interface /DomainEvent";
 
 export interface FailedEvent<T extends DomainEvent<any>> {
   event: T;

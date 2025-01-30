@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { EventProcessingState } from "../../interfaces/EventProcessingStateManager";
+import React from "react";
+import { EventProcessingState } from "../../addons/interfaces/EventProcessingStateManager";
 import { useEventContext } from "./useEventContext";
 
 export function useEventProcessingState(
@@ -7,7 +7,7 @@ export function useEventProcessingState(
 ) {
   const { eventProcessingState } = useEventContext();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (onStateChange) onStateChange(eventProcessingState);
   }, [onStateChange, eventProcessingState]);
   return eventProcessingState;

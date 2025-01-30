@@ -1,204 +1,241 @@
 # domain-eventrix
 
-## Description
-A TypeScript library for managing domain events, providing integration with React, React Native, and supporting DDD use cases. Designed to work in TypeScript projects, it enables developers to implement event-driven architectures effectively.
+A powerful TypeScript library for managing domain events with seamless integration for React, React Native, and Domain-Driven Design (DDD). Built to enhance event-driven architectures with features like retry strategies, dead letter queues, and state management.
+
+[![npm version](https://badge.fury.io/js/domain-eventrix.svg)](https://badge.fury.io/js/domain-eventrix)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Features
+
+- 🚀 Robust event bus implementation with TypeScript support
+- 🔄 Built-in retry strategies and dead letter queue
+- 📊 Event processing state management
+- ⚛️ First-class React and React Native integration
+- 🏛️ DDD-friendly with aggregate root support
+- 🔍 Event monitoring system
+- 🎨 Flexible configuration options
 
 ## Installation
-To install the library, use npm or yarn:
 
 ```bash
 npm install domain-eventrix
-```
-or
-```bash
+# or
 yarn add domain-eventrix
+# or
+pnpm add domain-eventrix
 ```
 
-## Usage
-### Configuring the Event Bus
-To configure the `SharedEnhancedEventBus`, you can do the following:
+## Quick Start
+
+### 1. Create an Event Bus
 
 ```typescript
-import { SharedEnhancedEventBus } from "domain-eventrix";
+import DomainEventrix from "domain-eventrix"
 
-SharedEnhancedEventBus.configure({
-  enableMonitoringSystem: true,
-  enableRetrySystem: true,
-});
+// Create a shared (default) event bus
+DomainEventrix.create()
+
+// Or create a named event bus
+DomainEventrix.create({
+  eventBusKey: "CustomEventBus",
+  enableStateManagement: true
+})
 ```
 
-### Creating an Instance of `EnhancedEventBus`
-You can create a new instance of `EnhancedEventBus` as follows:
+### 2. Define Events and Handlers
 
 ```typescript
-import { createEnhancedEventBus } from "domain-eventrix";
+import { DomainEvent, DomainEventMessage, EventHandler, DomainEventHandler } from "domain-eventrix"
 
-const myEventBus = createEnhancedEventBus({
-  enableMonitoringSystem: true,
-  enableRetrySystem: true,
-});
-```
+// Define an event
+@DomainEventMessage("UserRegistered")
+class UserRegisteredEvent extends DomainEvent<User> {
+  constructor(user: User) {
+    super(user)
+  }
+}
 
-### Registering the Instance
-To register the instance with the `InstanceManager`, use the following code:
-
-```typescript
-import { InstanceManager } from "domain-eventrix";
-
-InstanceManager.register("myEventBusKey", myEventBus);
-```
-
-### Using the Event Bus
-You can publish events using the event bus:
-
-```typescript
-myEventBus.publish(new UserDomainEvent({}));
-```
-
-### Using the Event Bus with Decorators
-When using decorators, you can pass the instance as follows:
-
-```typescript
-import { DomainEventHandler } from "domain-eventrix";
-
-@DomainEventHandler(UserDomainEvent, {
-  message: "User domain event handler",
-  isVisibleOnUI: true,
-}, "myEventBusKey")
-class UserDomainEventHandler extends EventHandler<any, UserDomainEvent> {
-  async execute(event: UserDomainEvent): Promise<void> {
-    console.log("Executing", this.getEventName());
-    // Handle the event
+// Define a handler
+@DomainEventHandler(UserRegisteredEvent, {
+  message: "Handle user registration",
+  isVisibleOnUI: true
+})
+class UserRegistrationHandler extends EventHandler<User, UserRegisteredEvent> {
+  async execute(event: UserRegisteredEvent): Promise<void> {
+    const user = event.data
+    // Handle the registration
+    console.log(`User registered: ${user.name}`)
   }
 }
 ```
 
-### Detailed Use Case: User Registration with DDD
-In a typical user registration scenario, you might want to handle user domain events. Here’s how you can implement it using the `AggregateEventDispatcher`:
+### 3. Use the Event Bus
 
-1. **Define the Domain Event**:
-   ```typescript
-   @DomainEventMessage("User Registered")
-   class UserRegisteredEvent extends DomainEvent<any> {
-     constructor(data: any) {
-       super(data);
-     }
-   }
-   ```
+```typescript
+const eventBus = DomainEventrix.get() // Get shared bus
+// or
+const customBus = DomainEventrix.get("CustomEventBus") // Get named bus
 
-2. **Create the Aggregate**:
-   ```typescript
-   class UserAggregate implements Aggregate {
-     private domainEvents: DomainEvent<any>[] = [];
-     private id: string;
+// Publish events
+eventBus.publish(new UserRegisteredEvent(user))
+// or publish and execute immediately
+eventBus.publishAndDispatchImmediate(new UserRegisteredEvent(user))
+```
 
-     constructor(id: string) {
-       this.id = id;
-     }
+## Core Concepts
 
-     getID() {
-       return this.id;
-     }
+### Event Bus Types
 
-     getDomainEvents() {
-       return this.domainEvents;
-     }
+Domain-eventrix provides two types of event buses:
 
-     clearDomainEvent() {
-       this.domainEvents = [];
-     }
+1. **SharedEnhancedEventBus** (Default)
+   - Singleton instance shared across your application
+   - Perfect for most use cases
 
-     registerUser(data: any) {
-       const event = new UserRegisteredEvent(data);
-       this.domainEvents.push(event);
-     }
-   }
-   ```
+2. **EnhancedEventBus**
+   - Named instances for specific contexts
+   - Useful when you need isolated event handling
 
-3. **Using the `AggregateEventDispatcher`**:
-   ```typescript
-   const dispatcher = new AggregateEventDispatcher<UserAggregate>("myEventBusKey");
-   const userAggregate = new UserAggregate("user-1");
-   userAggregate.registerUser({ username: "john_doe" });
-   dispatcher.queueAggregateForDispatch(userAggregate);
-   dispatcher.dispatchEventsForMarkedAggregate(userAggregate.getID());
-   ```
+### Event Processing Features
+
+- **Retry Strategy**: Configurable retry attempts for failed event processing
+- **Dead Letter Queue**: Handle persistently failed events
+- **State Management**: Track event processing status
+- **Monitoring**: observe event flow and processing metrics
+
+## Advanced Usage
+
+### Domain-Driven Design Integration
+
+```typescript
+import { AggregateEventDispatcher, Aggregate } from 'domain-eventrix/ddd'
+
+class UserAggregate implements Aggregate {
+  private domainEvents: DomainEvent<any>[] = []
+  
+  constructor(public id: string, public name: string) {}
+  
+  register() {
+    const event = new UserRegisteredEvent({ id: this.id, name: this.name })
+    this.domainEvents.push(event)
+    AggregateEventDispatcher.get().queueAggregateForDispatch(this)
+  }
+  
+  getDomainEvents() { return this.domainEvents }
+  getID() { return this.id }
+  clearDomainEvent() { this.domainEvents = [] }
+}
+
+// Usage
+const user = new UserAggregate("1", "John Doe")
+user.register()
+AggregateEventDispatcher.get().dispatchEventsForMarkedAggregate(user.id)
+```
 
 ### React Integration
-To integrate the library with a React application, you can use the `EventProvider` to manage the event bus context:
 
-1. **Using `SharedEnhancedEventBus`**:
-   ```typescript
-   import React from "react";
-   import { EventProvider, SharedEnhancedEventBus } from "domain-eventrix";
+#### Setup Event Provider
 
-   const App: React.FC = () => {
-     return (
-       <EventProvider eventBusKey={SharedEnhancedEventBus}>
-         <UserRegistration />
-       </EventProvider>
-     );
-   };
-   ```
+```tsx
+// eventrix.config.ts
+import DomainEventrix from "domain-eventrix"
 
-2. **Using `EnhancedEventBus`**:
-   ```typescript
-   import React from "react";
-   import { EventProvider, createEnhancedEventBus } from "domain-eventrix";
+DomainEventrix.create({
+  eventBusKey: "ReactApp",
+  enableStateManagement: true
+})
 
-   const myEventBus = createEnhancedEventBus({
-     enableMonitoringSystem: true,
-     enableRetrySystem: true,
-   });
-   InstanceManager.register("myEventBusKey", myEventBus);
+// App.tsx
+import { EventProvider } from "domain-eventrix/react"
+import "./eventrix.config"
 
-   const App: React.FC = () => {
-     return (
-       <EventProvider eventBusKey="myEventBusKey">
-         <UserRegistration />
-       </EventProvider>
-     );
-   };
-   ```
+function App() {
+  return (
+    <EventProvider eventBusKey="ReactApp">
+      <YourApp />
+    </EventProvider>
+  )
+}
+```
 
-### Using Hooks in React
-The library provides hooks to facilitate the use of the event bus in functional components:
+#### Use Hooks
 
-1. **Using `useEventBus`**:
-   ```typescript
-   import { useEventBus } from "domain-eventrix";
+```tsx
+import { 
+  useEventBus,
+  useEventContext,
+  useEventBusMethods,
+  useEventProcessingState
+} from "domain-eventrix/react"
 
-   const MyComponent: React.FC = () => {
-     const eventBus = useEventBus();
+function UserComponent() {
+  const { publish } = useEventBusMethods()
+  
+  const handleRegister = () => {
+    publish(new UserRegisteredEvent({ name: "John Doe" }))
+  }
+  
+  // Monitor event processing
+  useEventProcessingState(state => {
+    console.log('Current processing state:', state)
+  })
+  
+  return <button onClick={handleRegister}>Register User</button>
+}
+```
 
-     const handleClick = () => {
-       eventBus.publish(new UserDomainEvent({}));
-     };
+## Configuration Options
 
-     return <button onClick={handleClick}>Trigger Event</button>;
-   };
-   ```
+```typescript
+DomainEventrix.create({
+  eventBusKey?: string,           // Custom event bus identifier
+  enableStateManagement?: boolean, // Enable processing state tracking
+  enableMonitoringSystem?: boolean,// Enable event monitoring
+  enableRetrySystem?: boolean,     // Enable retry strategy
+  retryAttempts?: number,         // Number of retry attempts
+  initialRetryDelay?: number,     // Initial delay between retries (ms)
+  maxRetryDelay?: number,         // Maximum delay between retries (ms)
+  deadLetterQueueSize?: number    // Size of dead letter queue
+})
+```
 
-2. **Using `useEventContext`**:
-   ```typescript
-   import { useEventContext } from "domain-eventrix";
+## Best Practices
 
-   const MyComponent: React.FC = () => {
-     const { getEventBus, eventProcessingState } = useEventContext();
+1. **Event Bus Creation**
+   - Use `DomainEventrix.create()` at your application's entry point
+   - Configure options based on your environment needs
 
-     const handleClick = () => {
-       const eventBus = getEventBus();
-       eventBus.publish(new UserDomainEvent({}));
-     };
+2. **Event Handling**
+   - Keep handlers focused and single-purpose
+   - Handle errors appropriately in execute methods
+   - Use TypeScript for better type safety
 
-     return <button onClick={handleClick}>Trigger Event</button>;
-   };
-   ```
+3. **React Integration**
+   - Initialize configuration before rendering
+   - Use hooks for accessing event bus functionality
+   - Monitor processing state for better UX
 
-
+4. **DDD Implementation**
+   - Keep aggregates focused and consistent
+   - Dispatch events after completing business logic
+   - Clear domain events after successful dispatch
 
 ## Contributing
-Contributions are welcome! Please submit a pull request or open an issue for any suggestions or improvements.
+
+We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## License
-This project is licensed under the MIT License.
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+<!-- ## Support
+
+- Documentation: [Full Documentation](https://github.com/yourusername/domain-eventrix/wiki)
+- Issues: [GitHub Issues](https://github.com/yourusername/domain-eventrix/issues)
+- Questions: [GitHub Discussions](https://github.com/yourusername/domain-eventrix/discussions) -->

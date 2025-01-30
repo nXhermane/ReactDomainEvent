@@ -1,8 +1,8 @@
-import { EventData, IDomainEvent } from "./interfaces/DomainEvent";
-import { EventType, IEventBus } from "./interfaces/EventBus";
+import { EventData, IDomainEvent } from "./interface /DomainEvent";
+import { EventType, IEventBus } from "./interface /EventBus";
 import { EventHandler } from "./EventHandler";
 import { DomainEvent } from "./DomainEvent";
-import Stack from "../utils/Stack";
+import Stack from "../../utils/Stack";
 
 type EventQueueObject = { event: DomainEvent<any>; timestamp: number };
 export abstract class EventBus implements IEventBus {

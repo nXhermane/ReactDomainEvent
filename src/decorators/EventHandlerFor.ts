@@ -1,10 +1,11 @@
-import { EventBus } from "../EventBus";
-import { EventHandler } from "../EventHandler";
-import { EventData, IDomainEvent } from "../interfaces/DomainEvent";
+import { EventBus } from "../core/EventBus";
+import { EventHandler } from "../core/EventHandler";
+import { EventData, IDomainEvent } from "../core/interface /DomainEvent";
 import { Constants } from "../constants/constants";
-import { InstanceManager } from "../shared/InstanceManager";
-import { EventType } from "../type";
-import { Constructor } from "../types";
+import { Constructor } from "../types/types";
+import { DomainEventrix } from "../DomainEventrix";
+import { EventType } from "../core/interface /EventBus";
+import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
 
 /**
  * Permet de souscrir l'event handler a un evenement du bus d'evenement
@@ -14,7 +15,9 @@ import { Constructor } from "../types";
  */
 export function EventHandlerFor(
   eventType: EventType,
-  eventBusKey: string | Constructor<EventBus> = Constants.eventBusDefaultKey
+  eventBusKey:
+    | string
+    | Constructor<EnhancedEventBus> = Constants.eventBusDefaultKey
 ): (target: Function) => any {
   return function (target: Function) {
     const eventName =
@@ -23,13 +26,20 @@ export function EventHandlerFor(
     Reflect.defineMetadata(Constants.handlerMetaDataKey, eventName, target);
     // sauvegarde de la reference au constructeur original et typer explicitment le constructeur
     const originalConstructor = target as { new (...args: any[]): any };
-    // Recuperer l'instance de l'eventBus
-    const eventBus = InstanceManager.resolve(eventBusKey);
+
+    //Enregistrer la cle de l'event bus utilisé
+    Reflect.defineMetadata(
+      Constants.handlerEventBusMetaDataKey,
+      eventBusKey,
+      target
+    );
+
     // Creation d'un nouveau construteur
     const newConstructor: any = function (...args: any[]) {
       //Instancier l'objet de la classe d'origine
       const instance = new originalConstructor(...args);
-
+      // Recuperer l'instance de l'eventBus
+      const eventBus = DomainEventrix.get(eventBusKey);
       // Ajout de l'instance a l'event bus
       eventBus.suscriber(
         instance as EventHandler<EventData, IDomainEvent<EventData>>

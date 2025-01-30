@@ -1,13 +1,13 @@
 import { Constants } from "../constants/constants";
-import { EnhancedEventBus, EnhancedEventBusConfig } from "../EnhancedEventBus";
-import { DeadLetterQueue } from "../DeadLetterQueue";
-import { ExponentialBackoffStrategy } from "../ExponentialBackoffStrategy";
-import { FailedEvent } from "../interfaces/DeadLetterQueue";
-import { NullExponentialBackOffStrategy } from "../NullObject/NullExponentialBackOffStrategy";
-import { NullDeadLetterQueue } from "../NullObject/NullDeadLetterQueue";
-import { EventMonitoringSystem } from "../EventMonitoringSystem";
-import { NullEventMonitoringSystem } from "../NullObject/NullEventMonitoringSystem";
-import { OnDeadLetter } from "../types";
+import { EnhancedEventBus, EnhancedEventBusConfig } from "../EnhancedEventBus/EnhancedEventBus";
+import { DeadLetterQueue } from "../addons/DeadLetterQueue";
+import { ExponentialBackoffStrategy } from "../addons/ExponentialBackoffStrategy";
+import { FailedEvent } from "../addons/interfaces/DeadLetterQueue";
+import { NullExponentialBackOffStrategy } from "../addons/NullObject/NullExponentialBackOffStrategy";
+import { NullDeadLetterQueue } from "../addons/NullObject/NullDeadLetterQueue";
+import { EventMonitoringSystem } from "../addons/EventMonitoringSystem";
+import { NullEventMonitoringSystem } from "../addons/NullObject/NullEventMonitoringSystem";
+import { OnDeadLetter } from "../types/types";
 
 export function createEnhancedEventBus(
   config: EnhancedEventBusConfig,
@@ -32,5 +32,5 @@ export function createEnhancedEventBus(
     ? new EventMonitoringSystem()
     : new NullEventMonitoringSystem();
 
-  return new EnhancedEventBus(retryStrategy, deadLettered, monitoring);
+  return new EnhancedEventBus(config.eventBusKey,retryStrategy, deadLettered, monitoring);
 }

@@ -1,13 +1,12 @@
-import { DomainEvent } from "./DomainEvent";
-import { EventHandler } from "./EventHandler";
-import { DomainEventState, EventMetadata } from "./interfaces/DomainEvent";
-import { EventHandlerMetaData, HandlerState } from "./interfaces/EventHandler";
+import { DomainEvent } from "../core/DomainEvent";
+import { EventHandler } from "../core/EventHandler";
+import { DomainEventState, EventMetadata } from "../core/interface /DomainEvent";
+import { EventHandlerMetaData, HandlerState } from "../core/interface /EventHandler";
 import {
   EventProcessingState,
   EventProcessingStateObserver,
   IEventProcessingStateManager,
 } from "./interfaces/EventProcessingStateManager";
-
 
 interface ArchiEventProcessingState extends EventProcessingState {
   child: EventProcessingState[];
@@ -16,10 +15,9 @@ interface ArchiEventProcessingState extends EventProcessingState {
 export class EventProcessingStateManager
   implements IEventProcessingStateManager
 {
-  private static instance: EventProcessingStateManager | null = null;
   private observers: EventProcessingStateObserver[] = [];
 
-  private constructor() {}
+  constructor() {}
   subscribe(observer: EventProcessingStateObserver): void {
     this.observers.push(observer);
   }
@@ -30,12 +28,6 @@ export class EventProcessingStateManager
     for (const observer of this.observers) {
       observer.update(Array.from(this.state.values()));
     }
-  }
-
-  static getInstance(): EventProcessingStateManager {
-    if (!EventProcessingStateManager.instance)
-      EventProcessingStateManager.instance = new EventProcessingStateManager();
-    return EventProcessingStateManager.instance;
   }
 
   private state: Map<string, EventProcessingState> = new Map();
@@ -54,7 +46,7 @@ export class EventProcessingStateManager
    */
   addEvent(event: DomainEvent<any>): void {
     const eventMetaData = event.getMetaData();
-   
+
     if (!this.state.has(eventMetaData.eventId)) {
       const eventProcessingState: EventProcessingState = {
         domainEventMetadata: eventMetaData,
@@ -84,9 +76,7 @@ export class EventProcessingStateManager
   addHandler(event: DomainEvent<any>, handler: EventHandler<any, any>): void {
     this.addEvent(event);
     const handlerMetadata = handler.getMetadata();
-    const eventProcessingState = this.state.get(
-      event.getId()
-    )!
+    const eventProcessingState = this.state.get(event.getId())!;
     const updatedState = this.addOrUpdateHandlerMetadata(
       eventProcessingState,
       handlerMetadata

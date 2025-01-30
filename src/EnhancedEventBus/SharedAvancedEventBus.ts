@@ -1,24 +1,25 @@
-import { Constants } from "./constants/constants";
-import { DeadLetterQueue } from "./DeadLetterQueue";
+import { Constants } from "../constants/constants";
+import { DeadLetterQueue } from "../addons/DeadLetterQueue";
 import { EnhancedEventBus, EnhancedEventBusConfig } from "./EnhancedEventBus";
-import { EventMonitoringSystem } from "./EventMonitoringSystem";
-import { ExponentialBackoffStrategy } from "./ExponentialBackoffStrategy";
-import { FailedEvent, IDeadLetterQueue } from "./interfaces/DeadLetterQueue";
-import { IEventMonitoringSystem } from "./interfaces/EventMonitoringSystem";
-import { IExponentialBackoffStrategy } from "./interfaces/ExponentialBackOfStategy";
-import { NullDeadLetterQueue } from "./NullObject/NullDeadLetterQueue";
-import { NullEventMonitoringSystem } from "./NullObject/NullEventMonitoringSystem";
-import { NullExponentialBackOffStrategy } from "./NullObject/NullExponentialBackOffStrategy";
-import { InstanceManager } from "./shared/InstanceManager";
-import { OnDeadLetter } from "./types";
+import { EventMonitoringSystem } from "../addons/EventMonitoringSystem";
+import { ExponentialBackoffStrategy } from "../addons/ExponentialBackoffStrategy";
+import { FailedEvent, IDeadLetterQueue } from "../addons/interfaces/DeadLetterQueue";
+import { IEventMonitoringSystem } from "../addons/interfaces/EventMonitoringSystem";
+import { IExponentialBackoffStrategy } from "../addons/interfaces/ExponentialBackOfStategy";
+import { NullDeadLetterQueue } from "../addons/NullObject/NullDeadLetterQueue";
+import { NullEventMonitoringSystem } from "../addons/NullObject/NullEventMonitoringSystem";
+import { NullExponentialBackOffStrategy } from "../addons/NullObject/NullExponentialBackOffStrategy";
+import { Constructor, OnDeadLetter } from "../types/types";
 
-export interface SharedEnhancedEventBusConfig extends EnhancedEventBusConfig {
+export interface SharedEnhancedEventBusConfig
+  extends Partial<EnhancedEventBusConfig> {
   onDeadLetter?: OnDeadLetter;
 }
 export class SharedEnhancedEventBus extends EnhancedEventBus {
   private static intance: SharedEnhancedEventBus | null;
   private static config: SharedEnhancedEventBusConfig | null;
   private static defaultConfig = {
+    eventBusKey: Constants.eventBusDefaultKey,
     enableMonitoringSystem: true,
     enableRetrySystem: true,
     onDeadLetter: async (event: FailedEvent<any>) => {},
@@ -28,19 +29,16 @@ export class SharedEnhancedEventBus extends EnhancedEventBus {
     maxEventOnDQL: Constants.maxEventOnDQL,
   };
   private constructor(
+    eventBusKey: string | Constructor<EnhancedEventBus>,
     retryStrategy: IExponentialBackoffStrategy,
     deadLetterQueue: IDeadLetterQueue,
     monitoring: IEventMonitoringSystem
   ) {
-    super(retryStrategy, deadLetterQueue, monitoring);
+    super(eventBusKey, retryStrategy, deadLetterQueue, monitoring);
   }
   static configure(config: SharedEnhancedEventBusConfig) {
     SharedEnhancedEventBus.config = satisfies(config);
     SharedEnhancedEventBus.intance = SharedEnhancedEventBus.create(config);
-    InstanceManager.register<SharedEnhancedEventBus>(
-      Constants.eventBusDefaultKey,
-      SharedEnhancedEventBus.getInstance()
-    );
   }
 
   private static create(
@@ -73,7 +71,12 @@ export class SharedEnhancedEventBus extends EnhancedEventBus {
       ? new EventMonitoringSystem()
       : new NullEventMonitoringSystem();
 
-    return new SharedEnhancedEventBus(retryStrategy, deadLettered, monitoring);
+    return new SharedEnhancedEventBus(
+      config.eventBusKey || SharedEnhancedEventBus.defaultConfig.eventBusKey,
+      retryStrategy,
+      deadLettered,
+      monitoring
+    );
   }
 
   static getInstance(): SharedEnhancedEventBus {
@@ -83,15 +86,11 @@ export class SharedEnhancedEventBus extends EnhancedEventBus {
           ? SharedEnhancedEventBus.config
           : SharedEnhancedEventBus.defaultConfig
       );
-      InstanceManager.register<SharedEnhancedEventBus>(
-        Constants.eventBusDefaultKey,
-        SharedEnhancedEventBus.intance
-      );
     }
     return SharedEnhancedEventBus.intance;
   }
 }
-//TODO : je vais implementer cette mehtode correctemenet plus tard
+//TODO : je vais implementer cette mehtode correctement plus tard
 function satisfies(
   config: SharedEnhancedEventBusConfig
 ): SharedEnhancedEventBusConfig {

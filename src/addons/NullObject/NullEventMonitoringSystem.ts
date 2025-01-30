@@ -1,4 +1,4 @@
-import { Config } from "../constants/Config";
+import { Config } from "../../constants/Config";
 import {
   EventMetricsReport,
   IEventMonitoringSystem,

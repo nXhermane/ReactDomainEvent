@@ -1,4 +1,4 @@
-import { ExceptionBase } from "../errors/ExceptionBase";
+import { ExceptionBase } from "../../errors/ExceptionBase";
 
 export interface IDomainEvent<T extends EventData> {
   metadata: EventMetadata;

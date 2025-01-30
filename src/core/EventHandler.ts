@@ -1,23 +1,23 @@
-import { EventData, IDomainEvent } from "./interfaces/DomainEvent";
+import { EventData, IDomainEvent } from "./interface /DomainEvent";
 import {
   EventHandlerMetaData,
   HandlerState,
   IEventHandler,
-} from "./interfaces/EventHandler";
-import { Constants } from "./constants/constants";
-import { HandlerStateDecorator } from "./decorators/internalDecorators/HandlerStateDecorator";
+} from "./interface /EventHandler";
+import { Constants } from "../constants/constants";
+import { HandlerStateDecorator } from "../decorators/internalDecorators/HandlerStateDecorator";
 import {
   DomainEventMessage,
   DomainEventMessageOptions,
-} from "./decorators/DomainEventMessage";
-import { InvalidDecoratorOrderError } from "./errors/InvalidDecoratorOrderError";
-import generateUniqueId from "../utils/generateUniqueId";
-import { EventHandlerFor } from "./decorators/EventHandlerFor";
+} from "../decorators/DomainEventMessage";
+import { InvalidDecoratorOrderError } from "../errors/InvalidDecoratorOrderError";
+import generateUniqueId from "../../utils/generateUniqueId";
+import { EventHandlerFor } from "../decorators/EventHandlerFor";
 
 export abstract class EventHandler<
   DataType extends EventData,
-  EventType extends IDomainEvent<DataType>
-> implements IEventHandler<DataType, EventType>
+  DomainEvent extends IDomainEvent<DataType>
+> implements IEventHandler<DataType, DomainEvent>
 {
   metadata: EventHandlerMetaData;
   public priority?: number | undefined;
@@ -37,17 +37,17 @@ export abstract class EventHandler<
       this.constructor
     );
     if (!domainMessageOptions) {
-      throw new InvalidDecoratorOrderError(
-        EventHandlerFor.name,
-        DomainEventMessage.name,
-        this.constructor.name
-      );
+      // throw new InvalidDecoratorOrderError(
+      //   EventHandlerFor.name,
+      //   DomainEventMessage.name,
+      //   this.constructor.name
+      // );
     }
     return {
       handlerId: generateUniqueId(),
       handlerState: HandlerState.WAITING,
-      message: domainMessageOptions.message || undefined,
-      showOnUI: domainMessageOptions.isVisibleOnUI || false,
+      message: domainMessageOptions?.message || undefined,
+      showOnUI: domainMessageOptions?.isVisibleOnUI || false,
     };
   }
   setHandlerState(state: HandlerState) {
@@ -56,9 +56,9 @@ export abstract class EventHandler<
   setPriority(priority: number): void {
     this.priority = priority;
   }
-  abstract execute(event: EventType): void | Promise<void>;
+  abstract execute(event: DomainEvent): void | Promise<void>;
   @HandlerStateDecorator()
-  _internalExecute(event: EventType): void | Promise<void> {
+  _internalExecute(event: DomainEvent): void | Promise<void> {
     return this.execute(event);
   }
   getEventName(): string {
@@ -67,6 +67,12 @@ export abstract class EventHandler<
       this.constructor
     );
     return metadata;
+  }
+  private getEventBusName(): string {
+    return Reflect.getMetadata(
+      Constants.handlerEventBusMetaDataKey,
+      this.constructor
+    );
   }
   getMetadata(): EventHandlerMetaData {
     return this.metadata;

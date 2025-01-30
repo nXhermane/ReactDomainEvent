@@ -1,4 +1,4 @@
-import { Config } from "../constants/Config";
+import { Config } from "../../constants/Config";
 import { IExponentialBackoffStrategy } from "../interfaces/ExponentialBackOfStategy";
 
 export class NullExponentialBackOffStrategy

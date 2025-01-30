@@ -1,31 +1,31 @@
 {
   "name": "domain-eventrix",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "description": "A Typescript library for managing domain events, providing integration with React,React Native , and supporting DDD use cases. Designed to work in Typescript projects.",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "typesVersions": {
     "*": {
       "ddd": [
-        "./dist/ddd/index.d.ts"
+        "./ddd/index.d.ts"
       ],
       "react": [
-        "./dist/react/index.d.ts"
+        "./react/index.d.ts"
       ]
     }
   },
   "exports": {
     "./react": {
-      "default": "./dist/react/index.js",
-      "types": "./dist/react/index.d.ts"
+      "default": "./react/index.js",
+      "types": "./react/index.d.ts"
     },
     "./ddd": {
-      "default": "./dist/ddd/index.js",
-      "types": "./dist/ddd/index.d.ts"
+      "default": "./ddd/index.js",
+      "types": "./ddd/index.d.ts"
     },
     ".": {
-      "default": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "default": "./index.js",
+      "types": "./index.d.ts"
     }
   },
   "author": "nXhermane",
@@ -38,25 +38,29 @@
     "start": "nodemon test.ts",
     "build": "webpack --mode production",
     "build:dev": "webpack && node clean-empty-dirs.js",
+    "rollup": "npx rollup -c rollup.config.js",
     "build:doc:html": "npx documentation build ./**/*.ts -f html -o docs",
     "build:doc:md": "npx documentation build ./**/*.ts -f md -o docs/Readme.md",
     "test": "jest"
   },
-  "files": [
-    "/dist",
-    "/dist/ddd",
-    "/dist/react",
-    "README.md"
-  ],
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-proposal-decorators": "^7.25.9",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
     "@react-native-async-storage/async-storage": "^2.1.0",
+    "@testing-library/react": "^16.2.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.7",
+    "babel-jest": "^29.7.0",
     "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^12.0.2",
     "documentation": "^14.0.3",
     "jest": "^29.7.0",
     "nodemon": "^3.1.9",
+    "react": "^19.0.0",
+    "rollup-plugin-dts": "^6.1.1",
     "terser-webpack-plugin": "^5.3.11",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
@@ -64,12 +68,13 @@
     "typescript": "^5.7.2",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1",
-    "workbox-webpack-plugin": "^7.3.0",
-    "rollup-plugin-dts": "^6.1.1"
+    "workbox-webpack-plugin": "^7.3.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
   },
   "dependencies": {
     "nanoid": "^5.0.9",
-    "react": "^19.0.0",
     "reflect-metadata": "^0.2.2"
   },
   "keywords": [

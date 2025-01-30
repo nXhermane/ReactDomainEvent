@@ -1,6 +1,6 @@
 import { DomainEvent } from "../DomainEvent";
 import { EventHandler } from "../EventHandler";
-import { Constructor } from "../types";
+import { Constructor } from "../../types/types";
 import { EventData } from "./DomainEvent";
 export type EventType<T extends EventData = any> =
   | string

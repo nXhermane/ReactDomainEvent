@@ -1,10 +1,9 @@
-const webpack = require("webpack");
 const path = require("path");
-const WorkboxWebpackPlugin = require("workbox-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = false || process.env.NODE_ENV === "production";
 const config = {
   entry: {
     index: "./src/index.ts",
@@ -14,13 +13,30 @@ const config = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
-    library: ["domain-eventrix", "[name]"],
+    library:"domain-eventrix",
     libraryTarget: "umd",
     globalObject: "this",
+    umdNamedDefine: true,
   },
   plugins: [
     new CleanWebpackPlugin(),
-   
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "./package.json",
+          to: "./package.json",
+        },
+        {
+          from: "./README.md",
+          to: "./README.md",
+        },
+        {
+          from: "./Usage-docs.md",
+          to: "./Usage-docs.md"
+        }
+
+      ],
+    }),
   ],
   module: {
     rules: [
@@ -52,7 +68,7 @@ const config = {
       minChunks: 1,
       minSize: 30000,
     },
-    minimize: isProduction,
+    minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
@@ -65,16 +81,23 @@ const config = {
   },
   mode: "development",
   externals: {
-    react: "react",
+    react: {
+      commonjs: "react",
+      commonjs2:"react",
+      amd:'react',
+      root:"React"
+    },
   },
 };
 
 module.exports = () => {
   if (isProduction) {
     config.mode = "production";
-  
   } else {
     config.mode = "development";
+  }
+  config.stats = {
+    errorDetails:true
   }
   return config;
 };

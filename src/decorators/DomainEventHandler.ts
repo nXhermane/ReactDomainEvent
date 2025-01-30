@@ -1,8 +1,8 @@
-import { EventBus } from "../EventBus";
+import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
 import { Constants } from "../constants/constants";
-import { EventType } from "../interfaces/EventBus";
+import { EventType } from "../core/interface /EventBus";
 
-import { Constructor } from "../types";
+import { Constructor } from "../types/types";
 
 import {
   DomainEventMessage,
@@ -23,7 +23,7 @@ import { EventHandlerFor } from "./EventHandlerFor";
 export function DomainEventHandler(
   eventType: EventType,
   messageOptions: Partial<DomainEventMessageOptions>,
-  eventBusKey: string | Constructor<EventBus> = Constants.eventBusDefaultKey
+  eventBusKey: string | Constructor<EnhancedEventBus> = Constants.eventBusDefaultKey
 ) {
   const eventName = typeof eventType === "string" ? eventType : eventType.name;
   return function (target: Function) {

@@ -1,11 +1,11 @@
-import { Config } from "../constants/Config";
-import { DomainEvent } from "../DomainEvent";
+import { Config } from "../../constants/Config";
+import { DomainEvent } from "../../core/DomainEvent";
 import {
   FailedEvent,
   FailedHandlerData,
   IDeadLetterQueue,
 } from "../interfaces/DeadLetterQueue";
-import { EventData } from "../interfaces/DomainEvent";
+import { EventData } from "../../core/interface /DomainEvent";
 
 export class NullDeadLetterQueue implements IDeadLetterQueue {
   async addFailedEvent<T extends DomainEvent<any>>(
