@@ -1,1 +1,2 @@
-export * from "./AggregateEventDispatcher"
+export * from "./AggregateEventDispatcher";
+export * from "./Aggregate";

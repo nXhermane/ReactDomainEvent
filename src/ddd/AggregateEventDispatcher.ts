@@ -4,28 +4,8 @@ import { DomainEventrix } from "../DomainEventrix";
 import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
 import { EventBus } from "../core/EventBus";
 import { Constructor } from "../types/types";
+import { Aggregate } from "./Aggregate";
 
-/**
- * @class AggregateRoot Basical Representation
- *
- */
-export abstract class Aggregate {
-  /**
-   * @abstract @method getID
-   * @description Return the DDD aggregateRoot id as string or number
-   */
-  abstract getID<ID extends any >(): ID;
-  /**
-   * @abstract @method getDomainEvents
-   * @description Return all domain events stored on the DDD aggregateRoot
-   */
-  abstract getDomainEvents(): DomainEvent<any>[];
-  /**
-   * @abstract @method clearDomainEvent
-   * @description Clear aggregateRoot DomainEvents Container
-   */
-  abstract clearDomainEvent(): void;
-}
 /**
  * @abstract @class AggregateEventDispatcher
  * @classdesc Cette classe permet de lancer et gerer les domains events dans les aggregates racines
