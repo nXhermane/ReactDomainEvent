@@ -1,6 +1,6 @@
 {
   "name": "domain-eventrix",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A Typescript library for managing domain events, providing integration with React,React Native , and supporting DDD use cases. Designed to work in Typescript projects.",
   "main": "./index.js",
   "types": "./index.d.ts",
