@@ -41,7 +41,7 @@ export function EventHandlerFor(
       // Recuperer l'instance de l'eventBus
       const eventBus = DomainEventrix.get(eventBusKey);
       // Ajout de l'instance a l'event bus
-      eventBus.suscriber(
+      eventBus.subscribe(
         instance as EventHandler<EventData, IDomainEvent<EventData>>
       );
       // retourner l'instance

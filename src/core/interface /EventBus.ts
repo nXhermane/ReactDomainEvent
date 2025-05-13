@@ -15,8 +15,11 @@ export interface IEventBus {
   >(
     event: T
   ): Promise<void>;
-  suscriber<DataType extends EventData, T extends DomainEvent<DataType>>(
+  subscribe<DataType extends EventData, T extends DomainEvent<DataType>>(
     handler: EventHandler<DataType, T>
   ): void;
   dispatch<T extends EventData = any>(eventType: EventType<T>): void;
+  unsubscribe<DataType extends EventData, T extends DomainEvent<DataType>>(
+    handler: EventHandler<DataType, T>
+  ): void;
 }

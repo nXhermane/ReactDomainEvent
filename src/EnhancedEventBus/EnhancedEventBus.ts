@@ -114,7 +114,7 @@ export class EnhancedEventBus extends EventBus {
     const event = failedEvent.event;
     const handlers = failedEvent.failedHandlersData
       .map((failedHandlerState) => {
-        return this.seachHandlerByNameOrId(
+        return this.searchHandlerByNameOrId(
           failedHandlerState.name,
           failedHandlerState.id
         );

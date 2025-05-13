@@ -7,27 +7,32 @@
   "typesVersions": {
     "*": {
       "ddd": [
-        "./ddd/index.d.ts"
+        "./dist/ddd/index.d.ts"
       ],
       "react": [
-        "./react/index.d.ts"
+        "./dist/react/index.d.ts"
       ]
     }
   },
   "exports": {
     "./react": {
-      "default": "./react/index.js",
-      "types": "./react/index.d.ts"
+      "default": "./dist/react/index.js",
+      "types": "./dist/react/index.d.ts"
     },
     "./ddd": {
-      "default": "./ddd/index.js",
-      "types": "./ddd/index.d.ts"
+      "default": "./dist/ddd/index.js",
+      "types": "./dist/ddd/index.d.ts"
     },
     ".": {
-      "default": "./index.js",
-      "types": "./index.d.ts"
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
+   "files": [
+    "./dist",
+    "./README.md",
+    "./Usage-docs.md"
+  ],
   "author": "nXhermane",
   "license": "MIT",
   "repository": {

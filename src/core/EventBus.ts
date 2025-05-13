@@ -35,7 +35,7 @@ export abstract class EventBus implements IEventBus {
     await this.dispatchEvent<T>(event);
   }
 
-  suscriber<DataType extends EventData, T extends IDomainEvent<DataType>>(
+  subscribe<DataType extends EventData, T extends IDomainEvent<DataType>>(
     handler: EventHandler<DataType, T>
   ): void {
     // Verifier s'il existe deja des handlers associés a ce l'event du handler a ajouter
@@ -136,7 +136,7 @@ export abstract class EventBus implements IEventBus {
     );
     return eventQueueObjects;
   }
-  protected seachHandlerByNameOrId<
+  protected searchHandlerByNameOrId<
     DataType extends EventData,
     T extends DomainEvent<DataType>
   >(name: string, id: string): EventHandler<DataType, T>[] {
@@ -151,5 +151,20 @@ export abstract class EventBus implements IEventBus {
       (handler) => handler.getId() === id || handler.getName() === name
     );
     return filteredHandler;
+  }
+  unsubscribe<DataType extends EventData, T extends IDomainEvent<DataType>>(
+    handler: EventHandler<DataType, T>
+  ): void {
+    const eventName = handler.getEventName();
+    const handlers = this.handlers.get(eventName);
+    
+    if (handlers) {
+      handlers.delete(handler);
+      
+      // Si plus aucun handler pour cet event, on peut supprimer l'entrée
+      if (handlers.size === 0) {
+        this.handlers.delete(eventName);
+      }
+    }
   }
 }

@@ -198,7 +198,7 @@ DomainEventrix.create({
   deadLetterQueueSize?: number    // Size of dead letter queue
 })
 ```
-
+## [Usage](Usage-docs.md)
 ## Best Practices
 
 1. **Event Bus Creation**

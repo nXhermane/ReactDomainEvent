@@ -3,7 +3,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
-const isProduction = false || process.env.NODE_ENV === "production";
+const isProduction = true || process.env.NODE_ENV === "production";
 const config = {
   entry: {
     index: "./src/index.ts",
@@ -20,23 +20,7 @@ const config = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "./package.json",
-          to: "./package.json",
-        },
-        {
-          from: "./README.md",
-          to: "./README.md",
-        },
-        {
-          from: "./Usage-docs.md",
-          to: "./Usage-docs.md"
-        }
 
-      ],
-    }),
   ],
   module: {
     rules: [

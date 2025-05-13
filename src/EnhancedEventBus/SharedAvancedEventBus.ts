@@ -16,7 +16,7 @@ export interface SharedEnhancedEventBusConfig
   onDeadLetter?: OnDeadLetter;
 }
 export class SharedEnhancedEventBus extends EnhancedEventBus {
-  private static intance: SharedEnhancedEventBus | null;
+  private static instance: SharedEnhancedEventBus | null;
   private static config: SharedEnhancedEventBusConfig | null;
   private static defaultConfig = {
     eventBusKey: Constants.eventBusDefaultKey,
@@ -38,7 +38,7 @@ export class SharedEnhancedEventBus extends EnhancedEventBus {
   }
   static configure(config: SharedEnhancedEventBusConfig) {
     SharedEnhancedEventBus.config = satisfies(config);
-    SharedEnhancedEventBus.intance = SharedEnhancedEventBus.create(config);
+    SharedEnhancedEventBus.instance = SharedEnhancedEventBus.create(config);
   }
 
   private static create(
@@ -80,14 +80,14 @@ export class SharedEnhancedEventBus extends EnhancedEventBus {
   }
 
   static getInstance(): SharedEnhancedEventBus {
-    if (!SharedEnhancedEventBus.intance) {
-      SharedEnhancedEventBus.intance = SharedEnhancedEventBus.create(
+    if (!SharedEnhancedEventBus.instance) {
+      SharedEnhancedEventBus.instance = SharedEnhancedEventBus.create(
         SharedEnhancedEventBus.config
           ? SharedEnhancedEventBus.config
           : SharedEnhancedEventBus.defaultConfig
       );
     }
-    return SharedEnhancedEventBus.intance;
+    return SharedEnhancedEventBus.instance;
   }
 }
 //TODO : je vais implementer cette mehtode correctement plus tard
