@@ -23,26 +23,29 @@ class EventContextProcessingStateObserver
 
 export interface EventProviderProps
   extends React.PropsWithChildren,
-    EventManagerConfig {}
+    EventManagerConfig {
+  // Ajout de la prop pour le composant de chargement
+  LoadingComponent?: React.ComponentType<any> | null;
+}
 
 export const EventProvider: React.FC<EventProviderProps> = ({
   children,
   enableMonitoringSystem,
   enableStateManagement,
-  eventBusKey,
+  eventBusKey = Constants.eventBusDefaultKey,
   maxAttempts,
   maxDelay,
   maxEventOnDQL,
   enableRetrySystem,
   onDeadLetter,
+  LoadingComponent = null, // Valeur par défaut
 }) => {
-  // State
+  // Utilisation de useState pour forcer le re-rendu une fois l'eventBus initialisé
+  const [isInitialized, setIsInitialized] = React.useState(false);
+  const eventBus = React.useRef<EnhancedEventBus | null>(null);
   const [eventProcessingState, setEventProcessingState] = React.useState<
     EventProcessingState[]
   >([]);
-   console.log("Provider Entering")
-  const eventBus = useRef<EnhancedEventBus | null>(null);
-
 
   const observer = React.useMemo<EventProcessingStateObserver>(
     () =>
@@ -55,49 +58,50 @@ export const EventProvider: React.FC<EventProviderProps> = ({
     []
   );
 
+  // Initialisation synchrone de l'EventBus
   React.useEffect(() => {
-    console.log("UseEffect Munt")
-    if (
-      !DomainEventrix.getInstanceManager().has(
-        eventBusKey || Constants.eventBusDefaultKey
-      )
-    ) {
-      console.log("EventBus Creation ", eventBus,eventBusKey,DomainEventrix.get(eventBusKey||Constants.eventBusDefaultKey))
-      DomainEventrix.create({
-        eventBusKey: eventBusKey || Constants.eventBusDefaultKey,
-        enableMonitoringSystem,
-        maxAttempts,
-        maxEventOnDQL,
-        maxDelay,
-        onDeadLetter,
-        enableRetrySystem,
-      });
-    }
-    if (eventBus.current === null) {
-      console.log("Assignement ", eventBus,eventBusKey,DomainEventrix.get(eventBusKey||Constants.eventBusDefaultKey))
-      eventBus.current = DomainEventrix.get(
-        eventBusKey || Constants.eventBusDefaultKey
-      );
-    }
-    if (enableStateManagement) {
-      DomainEventrix.addEventProcessingStateManager(eventBusKey);
-      DomainEventrix.getEventProcessingStateManagerByEventBusKey(
-        eventBusKey
-      )?.subscribe(observer);
-    }
+    try {
+      if (!DomainEventrix.getInstanceManager().has(eventBusKey)) {
+        DomainEventrix.create({
+          eventBusKey,
+          enableMonitoringSystem,
+          maxAttempts,
+          maxEventOnDQL,
+          maxDelay,
+          onDeadLetter,
+          enableRetrySystem,
+        });
+      }
 
-    return () => {
-      if (enableStateManagement)
-        DomainEventrix.getEventProcessingStateManagerByEventBusKey(
-          eventBusKey
-        )?.unsubscribe(observer);
-    };
+      eventBus.current = DomainEventrix.get(eventBusKey);
+      setIsInitialized(true);
+
+      if (enableStateManagement) {
+        DomainEventrix.addEventProcessingStateManager(eventBusKey);
+        DomainEventrix.getEventProcessingStateManagerByEventBusKey(eventBusKey)?.subscribe(observer);
+      }
+
+      return () => {
+        if (enableStateManagement) {
+          DomainEventrix.getEventProcessingStateManagerByEventBusKey(eventBusKey)?.unsubscribe(observer);
+        }
+      };
+    } catch (error) {
+      console.error('Failed to initialize EventBus:', error);
+      throw error;
+    }
   }, [eventBusKey, enableStateManagement]);
+
+  // Protection contre le rendu avant initialisation
+  if (!isInitialized || !eventBus.current) {
+    return LoadingComponent ? <LoadingComponent /> : null;
+  }
+
   return (
     <EventContext.Provider
       value={{
-        eventBus: eventBus.current as EnhancedEventBus,
-        eventProcessingState: eventProcessingState,
+        eventBus: eventBus.current,
+        eventProcessingState,
       }}
     >
       {children}
