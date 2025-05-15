@@ -1,6 +1,6 @@
 {
   "name": "domain-eventrix",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "A Typescript library for managing domain events, providing integration with React,React Native , and supporting DDD use cases. Designed to work in Typescript projects.",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -46,7 +46,8 @@
     "rollup": "npx rollup -c rollup.config.js",
     "build:doc:html": "npx documentation build ./**/*.ts -f html -o docs",
     "build:doc:md": "npx documentation build ./**/*.ts -f md -o docs/Readme.md",
-    "test": "jest"
+    "test": "jest",
+    "publish": "npm version patch && npm publish --access=public"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
