@@ -1,9 +1,8 @@
 import React from "react";
-import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
 import { EventProcessingState } from "../addons/interfaces/EventProcessingStateManager";
+import { IEventBus } from "../core/interface /EventBus";
 
 export interface EventContextValue {
-  //getEventBus(): EnhancedEventBus;
   /**
    * @property eventProssessingState
    * @description Contain the Executing DomainEvent State and Insights
@@ -13,7 +12,7 @@ export interface EventContextValue {
    * @property eventBus
    * @description Give access to specific EventBus
    */
-  eventBus: EnhancedEventBus
+  eventBus: IEventBus
 }
 
 export const EventContext = React.createContext<EventContextValue>(

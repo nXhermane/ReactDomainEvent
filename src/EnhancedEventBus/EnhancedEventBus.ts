@@ -1,6 +1,6 @@
 import { DomainEvent } from "../core/DomainEvent";
 import { DomainEventrix } from "../DomainEventrix";
-import { ExceptionBase } from "../errors/ExceptionBase";
+import { DomainExceptionBase } from "../errors/ExceptionBase";
 import { FailedEventNotFoundOnDLQ } from "../errors/FailedEventNotFoundOnDLQ";
 import { EventBus } from "../core/EventBus";
 import { EventHandler } from "../core/EventHandler";
@@ -8,7 +8,7 @@ import {
   FailedHandlerData,
   IDeadLetterQueue,
 } from "../addons/interfaces/DeadLetterQueue";
-import { DomainEventState, EventData } from "../core/interface /DomainEvent";
+import { DomainEventState, EventData, IDomainEvent } from "../core/interface /DomainEvent";
 import {
   EventMetricsReport,
   IEventMonitoringSystem,
@@ -60,10 +60,10 @@ export class EnhancedEventBus extends EventBus {
       if (
         this.retryStrategy.shouldRetry(
           metadata.attempts,
-          error as ExceptionBase
+          error as DomainExceptionBase
         )
       ) {
-        await this.scheduleRetry(handler, event, error as ExceptionBase);
+        await this.scheduleRetry(handler, event, error as DomainExceptionBase);
       } else {
         // Changer l'etat avant actualiser les donnees de l'eventProcessingStateManager
         event.setState(DomainEventState.NeedRetry);
@@ -73,7 +73,7 @@ export class EnhancedEventBus extends EventBus {
         await this.moveToDeadLetterQueue(event, {
           id: handler.getId(),
           name: handler.getName(),
-          error: error as ExceptionBase,
+          error: error as DomainExceptionBase,
         });
       }
     }
@@ -84,7 +84,7 @@ export class EnhancedEventBus extends EventBus {
   >(
     handler: EventHandler<DataType, T>,
     event: T,
-    error: ExceptionBase
+    error: DomainExceptionBase
   ): Promise<void> {
     const metadata = event.getMetaData();
     const nextRetryDelay = this.retryStrategy.getNextRetryDelay(

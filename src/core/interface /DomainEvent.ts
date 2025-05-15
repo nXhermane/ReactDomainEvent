@@ -1,10 +1,12 @@
-import { ExceptionBase } from "../../errors/ExceptionBase";
+import { DomainExceptionBase } from "../../errors/ExceptionBase";
 
 export interface IDomainEvent<T extends EventData> {
   metadata: EventMetadata;
   data: T;
   getId(): string;
   getName(): string;
+  setParentId(id: string ) : void 
+  getMetaData(): EventMetadata
 }
 
 export interface EventMetadata {
@@ -12,7 +14,7 @@ export interface EventMetadata {
   name: string;
   occurredAt: Date;
   attempts: number;
-  lastError?: ExceptionBase;
+  lastError?: DomainExceptionBase;
   nextRetryAt?: Date;
   domainEventState: DomainEventState;
   parentId?: string;

@@ -1,6 +1,6 @@
 import { Constants } from "../constants/constants";
 import { DomainEvent } from "../core/DomainEvent";
-import { ExceptionBase } from "../errors/ExceptionBase";
+import { DomainExceptionBase } from "../errors/ExceptionBase";
 import {
   FailedEvent,
   FailedEventSerialize,
@@ -96,7 +96,7 @@ export class DeadLetterQueue implements IDeadLetterQueue {
             return {
               id: failedHandlerData.id as string,
               name: failedHandlerData.name as string,
-              error: ExceptionBase.toDeserialized(failedHandlerData.error),
+              error: DomainExceptionBase.toDeserialized(failedHandlerData.error),
             };
           }
         );

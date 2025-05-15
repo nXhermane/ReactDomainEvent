@@ -1,6 +1,6 @@
-import { ExceptionBase } from "./ExceptionBase";
+import { DomainExceptionBase } from "./ExceptionBase";
 
-export class FailedEventNotFoundOnDLQ extends ExceptionBase {
+export class FailedEventNotFoundOnDLQ extends DomainExceptionBase {
     code: string = "FailedEventNotFoundOnDLQ";
     
 }

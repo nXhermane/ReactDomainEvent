@@ -4,14 +4,14 @@ import { EventHandler } from "./EventHandler";
 import { DomainEvent } from "./DomainEvent";
 import Stack from "../../utils/Stack";
 
-type EventQueueObject = { event: DomainEvent<any>; timestamp: number };
+type EventQueueObject = { event: IDomainEvent<any>; timestamp: number };
 export abstract class EventBus implements IEventBus {
   private eventQueue: Array<EventQueueObject> = [];
   private handlers: Map<string, Set<EventHandler<any, any>>> = new Map();
-  private queueStack: Stack<DomainEvent<any>> = new Stack();
+  private queueStack: Stack<IDomainEvent<any>> = new Stack();
   constructor() {}
 
-  publish<DataType extends EventData, T extends DomainEvent<DataType>>(
+  publish<DataType extends EventData, T extends IDomainEvent<DataType>>(
     event: T
   ): void {
     // Verifier si l'event actuelle est emise lors de l'execution d'un handler et si oui , on a lui attribut un parent
@@ -27,7 +27,7 @@ export abstract class EventBus implements IEventBus {
   }
   async publishAndDispatchImmediate<
     DataType extends EventData,
-    T extends DomainEvent<DataType>
+    T extends IDomainEvent<DataType>
   >(event: T): Promise<void> {
     // Publier l'event
     this.publish(event);
@@ -74,7 +74,7 @@ export abstract class EventBus implements IEventBus {
         });
     }
   }
-  private async dispatchEvent<T extends DomainEvent<any>>(
+  private async dispatchEvent<T extends IDomainEvent<any>>(
     event: T
   ): Promise<void> {
     // Ajouter l'evenement a la pile d'execution des handlers (Stack QueueStack)
@@ -85,7 +85,7 @@ export abstract class EventBus implements IEventBus {
     // Execution des handlers
     await Promise.all(
       Array.from(handlers).map((handler) =>
-        this.executeHandler<any, T>(handler, event)
+        this.executeHandler(handler, event)
       )
     );
     // Supprimer l'evenement de la file d'attente (eventQueue )
@@ -107,7 +107,7 @@ export abstract class EventBus implements IEventBus {
 
   private deleteEvent<
     DataType extends EventData,
-    T extends DomainEvent<DataType>
+    T extends IDomainEvent<DataType>
   >(event: T) {
     const eventIndex = this.eventQueue.findIndex(
       (eventObject) => event.getId() === eventObject.event.getId()

@@ -7,12 +7,9 @@ import {
 import { Constants } from "../constants/constants";
 import { HandlerStateDecorator } from "../decorators/internalDecorators/HandlerStateDecorator";
 import {
-  DomainEventMessage,
   DomainEventMessageOptions,
 } from "../decorators/DomainEventMessage";
-import { InvalidDecoratorOrderError } from "../errors/InvalidDecoratorOrderError";
 import generateUniqueId from "../../utils/generateUniqueId";
-import { EventHandlerFor } from "../decorators/EventHandlerFor";
 
 export abstract class EventHandler<
   DataType extends EventData,

@@ -2,9 +2,9 @@ import { Constants } from "../constants/constants";
 import { DomainEvent } from "../core/DomainEvent";
 import { DomainEventrix } from "../DomainEventrix";
 import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
-import { EventBus } from "../core/EventBus";
 import { Constructor } from "../types/types";
 import { Aggregate } from "./Aggregate";
+import { IEventBus } from "../core/interface /EventBus";
 
 /**
  * @abstract @class AggregateEventDispatcher
@@ -12,7 +12,7 @@ import { Aggregate } from "./Aggregate";
  */
 
 export abstract class AggregateEventDispatcher<T extends Aggregate> {
-  private eventBus: EventBus;
+  private eventBus: IEventBus;
   private queuedAggregates: T[] = [];
   constructor(
     eventBusKey:

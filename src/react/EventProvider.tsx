@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import {
   EventProcessingState,
   EventProcessingStateObserver,
@@ -6,7 +6,7 @@ import {
 import { EventContext } from "./EventContext";
 import { DomainEventrix, EventManagerConfig } from "../DomainEventrix";
 import { Constants } from "../constants/constants";
-import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
+import { IEventBus } from "../core/interface /EventBus";
 
 class EventContextProcessingStateObserver
   implements EventProcessingStateObserver
@@ -42,7 +42,7 @@ export const EventProvider: React.FC<EventProviderProps> = ({
 }) => {
   // Utilisation de useState pour forcer le re-rendu une fois l'eventBus initialisé
   const [isInitialized, setIsInitialized] = React.useState(false);
-  const eventBus = React.useRef<EnhancedEventBus | null>(null);
+  const eventBus = React.useRef<IEventBus | null>(null);
   const [eventProcessingState, setEventProcessingState] = React.useState<
     EventProcessingState[]
   >([]);
@@ -78,16 +78,20 @@ export const EventProvider: React.FC<EventProviderProps> = ({
 
       if (enableStateManagement) {
         DomainEventrix.addEventProcessingStateManager(eventBusKey);
-        DomainEventrix.getEventProcessingStateManagerByEventBusKey(eventBusKey)?.subscribe(observer);
+        DomainEventrix.getEventProcessingStateManagerByEventBusKey(
+          eventBusKey
+        )?.subscribe(observer);
       }
 
       return () => {
         if (enableStateManagement) {
-          DomainEventrix.getEventProcessingStateManagerByEventBusKey(eventBusKey)?.unsubscribe(observer);
+          DomainEventrix.getEventProcessingStateManagerByEventBusKey(
+            eventBusKey
+          )?.unsubscribe(observer);
         }
       };
     } catch (error) {
-      console.error('Failed to initialize EventBus:', error);
+      console.error("Failed to initialize EventBus:", error);
       throw error;
     }
   }, [eventBusKey, enableStateManagement]);

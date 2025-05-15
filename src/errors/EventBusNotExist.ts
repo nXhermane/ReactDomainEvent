@@ -1,5 +1,5 @@
-import { ExceptionBase } from "./ExceptionBase";
+import { DomainExceptionBase } from "./ExceptionBase";
 
-export class EventBusNotExist extends ExceptionBase {
+export class EventBusNotExist extends DomainExceptionBase {
     code = "EventBusNotFound"
 }

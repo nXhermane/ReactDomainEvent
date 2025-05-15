@@ -1,5 +1,5 @@
 import { DomainEvent } from "../../core/DomainEvent";
-import { ExceptionBase } from "../../errors/ExceptionBase";
+import { DomainExceptionBase } from "../../errors/ExceptionBase";
 import { EventData } from "../../core/interface /DomainEvent";
 
 export interface FailedEvent<T extends DomainEvent<any>> {
@@ -14,7 +14,7 @@ export type FailedEventSerialize = {
 export type FailedHandlerData = {
   id: string;
   name: string;
-  error: ExceptionBase;
+  error: DomainExceptionBase;
 };
 
 export interface IDeadLetterQueue {

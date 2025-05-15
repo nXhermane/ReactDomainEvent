@@ -1,5 +1,5 @@
 import { Constants } from "../constants/constants";
-import { ExceptionBase } from "../errors/ExceptionBase";
+import { DomainExceptionBase } from "../errors/ExceptionBase";
 import { PermanentEventHandleFailureError } from "../errors/PermanentEventHandleFailureError";
 import { IExponentialBackoffStrategy } from "./interfaces/ExponentialBackOfStategy";
 
@@ -11,12 +11,12 @@ export class ExponentialBackoffStrategy implements IExponentialBackoffStrategy {
     ){
 
     }
-    shouldRetry(attempts: number, error: ExceptionBase): boolean {
+    shouldRetry(attempts: number, error: DomainExceptionBase): boolean {
        // Verifier si l'attempts est inferieur au maxAttempts
        if(attempts>= this.maxAttemps) return false 
        // L'Erreur est permanente lorsque le DeadLetterEchoue au traitement de l'event 
        // Mais cela n'est pas encore implementer dans notre system 
-       if(ExceptionBase.hasSameError(error,new PermanentEventHandleFailureError(""))) return false ;
+       if(DomainExceptionBase.hasSameError(error,new PermanentEventHandleFailureError(""))) return false ;
        return true
     }
     getNextRetryDelay(attempts: number): number {

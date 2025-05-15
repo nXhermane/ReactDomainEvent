@@ -6,7 +6,7 @@ export interface SerializedException {
   code: string;
 }
 
-export class ExceptionBase extends Error {
+export class DomainExceptionBase extends Error {
   constructor(
     readonly message: string,
     protected readonly code?: string,
@@ -25,8 +25,8 @@ export class ExceptionBase extends Error {
       code: this.code || "ExceptionBase",
     };
   }
-  static toDeserialized(data: SerializedException): ExceptionBase {
-    return new ExceptionBase(
+  static toDeserialized(data: SerializedException): DomainExceptionBase {
+    return new DomainExceptionBase(
       data.message,
       data.code,
       JSON.parse(data.cause || ""),
@@ -36,7 +36,7 @@ export class ExceptionBase extends Error {
   toJSON(): string {
     return JSON.stringify(this.toSerialized());
   }
-  static hasSameError(error: ExceptionBase, error2: ExceptionBase) {
+  static hasSameError(error: DomainExceptionBase, error2: DomainExceptionBase) {
     return error.code === error2.code;
   }
 }

@@ -4,7 +4,7 @@ import { EventData, IDomainEvent } from "../core/interface /DomainEvent";
 import { Constants } from "../constants/constants";
 import { Constructor } from "../types/types";
 import { DomainEventrix } from "../DomainEventrix";
-import { EventType } from "../core/interface /EventBus";
+import { EventType, IEventBus } from "../core/interface /EventBus";
 import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
 
 /**
@@ -17,7 +17,7 @@ export function EventHandlerFor(
   eventType: EventType,
   eventBusKey:
     | string
-    | Constructor<EnhancedEventBus> = Constants.eventBusDefaultKey
+    | Constructor<IEventBus> = Constants.eventBusDefaultKey
 ): (target: Function) => any {
   return function (target: Function) {
     const eventName =

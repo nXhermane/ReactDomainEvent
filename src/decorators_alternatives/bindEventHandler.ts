@@ -1,6 +1,5 @@
 import { Constants } from "../constants/constants";
-import { EnhancedEventBus } from "../EnhancedEventBus/EnhancedEventBus";
-import { EventType } from "../core/interface /EventBus";
+import { EventType, IEventBus } from "../core/interface /EventBus";
 import { Constructor } from "../types/types";
 
 export function bindEventHandler(
@@ -8,7 +7,7 @@ export function bindEventHandler(
   eventType: EventType,
   eventBusKey:
     | string
-    | Constructor<EnhancedEventBus> = Constants.eventBusDefaultKey
+    | Constructor<IEventBus> = Constants.eventBusDefaultKey
 ) {
   const eventName = typeof eventType === "string" ? eventType : eventType.name;
   //Enregistrer le Event Type dans les metadata de la classe pour y acceder dans la  methode getEventName

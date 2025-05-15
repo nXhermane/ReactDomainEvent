@@ -1,5 +1,5 @@
-import { ExceptionBase } from "./ExceptionBase";
+import { DomainExceptionBase } from "./ExceptionBase";
 
-export class PermanentEventHandleFailureError extends ExceptionBase {
+export class PermanentEventHandleFailureError extends DomainExceptionBase {
     code:string = "PermanentEventHandleFailureError"
 }

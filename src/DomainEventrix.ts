@@ -5,6 +5,7 @@ import { createEnhancedEventBus } from "./factories/createEnhancedEventBus";
 import  InstanceManager from "./shared/InstanceManager";
 import { SharedEnhancedEventBus } from "./EnhancedEventBus/SharedAvancedEventBus";
 import { Constructor, OnDeadLetter } from "./types/types";
+import { IEventBus } from "./core/interface /EventBus";
 
 
 
@@ -40,14 +41,14 @@ export class DomainEventrix {
         },
         onDeadLetter
       );
-      this.instanceManager.register<EnhancedEventBus>(eventBusKey, eventBus);
+      this.instanceManager.register<IEventBus>(eventBusKey, eventBus);
     }
     if (enableStateManagement) this.addEventProcessingStateManager(eventBusKey);
   }
 
   static get(
-    eventBusKey?: string | Constructor<EnhancedEventBus>
-  ): EnhancedEventBus {
+    eventBusKey?: string | Constructor<IEventBus>
+  ): IEventBus {
     if (
       eventBusKey === undefined &&
       !this.instanceManager.has(Constants.eventBusDefaultKey)

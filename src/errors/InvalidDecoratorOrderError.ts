@@ -1,6 +1,6 @@
-import { ExceptionBase } from "./ExceptionBase";
+import { DomainExceptionBase } from "./ExceptionBase";
 
-export class InvalidDecoratorOrderError extends ExceptionBase {
+export class InvalidDecoratorOrderError extends DomainExceptionBase {
   code: string = "InvalidDecoratorOrderError";
   constructor(
     decoratorName: string,
