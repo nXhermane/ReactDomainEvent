@@ -1,11 +1,4 @@
-import { getPlatforms } from "./getPlatforms";
-
+import { nanoid } from "nanoid/non-secure";
 export default function (): string {
-  if (getPlatforms().isReactNative) {
-    const { nanoid } = require("nanoid/non-secure");
-    return nanoid();
-  } else {
-    const { nanoid } = require("nanoid");
-    return nanoid();
-  }
+  return nanoid();
 }

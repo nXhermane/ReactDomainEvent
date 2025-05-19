@@ -29,7 +29,7 @@ export class EnhancedEventBus extends EventBus {
   private readonly retryStrategy: IExponentialBackoffStrategy;
   private readonly deadLetterQueue: IDeadLetterQueue;
   private readonly monitoring: IEventMonitoringSystem;
-  private readonly eventBuskey: string | Constructor<EnhancedEventBus>;
+  private readonly eventBusKey: string | Constructor<EnhancedEventBus>;
   constructor(
     evenBusKey: string | Constructor<EnhancedEventBus>,
     retryStrategy: IExponentialBackoffStrategy,
@@ -37,7 +37,7 @@ export class EnhancedEventBus extends EventBus {
     monitoring: IEventMonitoringSystem
   ) {
     super();
-    this.eventBuskey = evenBusKey;
+    this.eventBusKey = evenBusKey;
     this.retryStrategy = retryStrategy;
     this.deadLetterQueue = deadLetterQueue;
     this.monitoring = monitoring;
@@ -68,8 +68,9 @@ export class EnhancedEventBus extends EventBus {
         // Changer l'etat avant actualiser les donnees de l'eventProcessingStateManager
         event.setState(DomainEventState.NeedRetry);
         DomainEventrix.getEventProcessingStateManagerByEventBusKey(
-          this.eventBuskey
+          this.eventBusKey
         )?.addHandler(event, handler);
+        console.log(this.eventBusKey)
         await this.moveToDeadLetterQueue(event, {
           id: handler.getId(),
           name: handler.getName(),

@@ -80,7 +80,7 @@ export class DomainEventrix {
     const absolutEventBusKey = eventBusKey || Constants.eventBusDefaultKey;
     if (!this.instanceManager.has(absolutEventBusKey)) {
       console.warn(
-        `L'eventBus ayant cette cle (${absolutEventBusKey}) n'existe pas. Veillez en creer une pour pouvoir `
+        `L'eventBus ayant cette cle (${absolutEventBusKey}) n'existe pas. Veillez en creer une pour pouvoir faire le get d'un event state manager `
       );
       return undefined;
     }
