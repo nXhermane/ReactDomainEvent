@@ -40,7 +40,7 @@
     "url": "git+https://github.com/nXhermane/ReactDomainEvent.git"
   },
   "scripts": {
-    "start": "nodemon test.ts",
+    "start": "nodemon index.ts",
     "build": "webpack --mode production",
     "build:dev": "webpack && node clean-empty-dirs.js",
     "rollup": "npx rollup -c rollup.config.js",
@@ -66,6 +66,7 @@
     "jest": "^29.7.0",
     "nodemon": "^3.1.9",
     "react": "^19.0.0",
+    "react-native": "^0.79.2",
     "rollup-plugin-dts": "^6.1.1",
     "terser-webpack-plugin": "^5.3.11",
     "ts-jest": "^29.2.5",
@@ -76,9 +77,7 @@
     "webpack-cli": "^6.0.1",
     "workbox-webpack-plugin": "^7.3.0"
   },
-  "peerDependencies": {
-    "react": "^19.0.0"
-  },
+  "peerDependencies": {},
   "dependencies": {
     "nanoid": "^5.0.9",
     "reflect-metadata": "^0.2.2"
